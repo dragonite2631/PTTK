@@ -247,14 +247,14 @@ flowchart TB
     UC_Export -.->|<<extend>>| UC_Main
 ```
 
-* **Ý nghĩa ca sử dụng:** Chức năng 5 tập trung duy nhất vào nghiệp vụ đơn lẻ: **Xem thống kê doanh thu sự kiện** (View Event Revenue Statistics) dành cho Ban tổ chức và Quản trị viên.
-* **Quan hệ `<<include>>` (Bắt buộc):**
-  * `Chọn sự kiện cần thống kê`: Xác định đối tượng sự kiện cần kết xuất báo cáo tài chính.
-  * `Tổng hợp & Tính toán KPIs`: Bước tính toán tự động các chỉ số doanh thu gộp, doanh thu thuần, tỷ lệ lấp đầy và giá vé bình quân.
-* **Quan hệ `<<extend>>` (Tùy chọn mở rộng):**
-  * `Lọc theo suất diễn & khoảng ngày`: Mở rộng khi cần thống kê thu hẹp.
-  * `Xem chi tiết phân bổ doanh thu theo phân khu`: Mở rộng khi cần phân tích sâu tỷ trọng từng hạng vé.
-  * `Xuất báo cáo doanh thu (Excel / PDF)`: Mở rộng khi cần lưu tệp ngoại tuyến về máy.
+* **Ý nghĩa ca sử dụng:** Chức năng 5 tập trung duy nhất vào nghiệp vụ đơn lẻ: **Xem thống kê doanh thu sự kiện** (View Event Revenue Statistics) dành cho Ban tổ chức và Quản trị viên. Biểu đồ Use Case chức năng 5 mô tả chi tiết ranh giới hệ thống thống kê doanh thu và tương tác giữa các tác nhân thông qua 2 loại quan hệ cấu trúc chuẩn UML:
+* **Quan hệ Bao hàm `<<include>>` (Bắt buộc):**
+  * `Chọn sự kiện cần thống kê`: Đây là hành động bắt buộc của người dùng. Hệ thống cần định danh chính xác mã sự kiện (eventId) làm tiền đề nạp đúng cấu trúc sơ đồ ghế, suất diễn và danh sách đơn hàng tương ứng để phục vụ tính toán.
+  * `Tổng hợp & Tính toán KPIs`: Là chuỗi thuật toán tự động bắt buộc do hệ thống thực thi ngay khi người dùng bấm nút tra cứu. Hệ thống sẽ quét toàn bộ dữ liệu đơn hàng và thực hiện các hàm tính toán tài chính (Doanh thu gộp, Doanh thu thuần, Tỷ lệ lấp đầy, Giá vé bình quân) để đảm bảo số liệu hiển thị luôn chính xác theo thời gian thực.
+* **Quan hệ Mở rộng `<<extend>>` (Tùy chọn mở rộng dựa trên extension points):**
+  * `Lọc theo suất diễn & khoảng ngày`: Điểm mở rộng khi Ban tổ chức có nhu cầu phân tích thu hẹp phạm vi dữ liệu theo từng đêm diễn cụ thể hoặc lọc sâu theo giai đoạn mở bán vé.
+  * `Xem chi tiết phân bổ doanh thu theo phân khu`: Điểm mở rộng khi Ban tổ chức cần xem biểu đồ trực quan biểu diễn tỷ trọng đóng góp tài chính của từng hạng vé (VIP, CAT 1, CAT 2, Standing) so với tổng doanh thu gộp.
+  * `Xuất báo cáo doanh thu (Excel / PDF)`: Điểm mở rộng kích hoạt khi người dùng muốn lưu trữ báo cáo ngoại tuyến dưới dạng tệp Excel hoặc in PDF để báo cáo nội bộ.
 
 ---
 

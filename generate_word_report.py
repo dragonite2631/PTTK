@@ -338,6 +338,16 @@ def build_full_docx():
     add_body_p(doc, "Trong bài tập môn học, thành viên 5 phụ trách chuyên sâu chức năng nghiệp vụ đơn lẻ 'Xem thống kê doanh thu sự kiện' (View Event Revenue Statistics). Biểu đồ Use Case phân rã chi tiết dưới đây làm rõ các ca sử dụng bao hàm (<<include>>) bắt buộc để thực hiện tính toán tài chính và các ca sử dụng mở rộng (<<extend>>) phục vụ lọc và kết xuất báo cáo:")
     add_diagram_image(doc, "uc_m5_view_revenue_detail.png", "Hình 2.6: Biểu đồ Use Case chi tiết - Chức năng Xem thống kê doanh thu sự kiện")
 
+    add_body_p(doc, "Biểu đồ Use Case chức năng 5 mô tả chi tiết ranh giới hệ thống thống kê doanh thu và cách thức các tác nhân tương tác thông qua 2 loại quan hệ cấu trúc chuẩn UML:\n"
+                    "1. Quan hệ Bao hàm (<<include>>):\n"
+                    "   - 'Chọn sự kiện cần thống kê': Đây là hành động bắt buộc của người dùng. Hệ thống cần định danh chính xác mã sự kiện (eventId) làm tiền đề nạp đúng cấu trúc sơ đồ ghế, suất diễn và danh sách đơn hàng tương ứng để phục vụ tính toán.\n"
+                    "   - 'Tổng hợp và tính toán KPIs (Doanh thu và tỉ lệ lấp đầy)': Là chuỗi thuật toán tự động bắt buộc do hệ thống thực thi ngay khi người dùng bấm nút tra cứu. Hệ thống sẽ quét toàn bộ dữ liệu đơn hàng và thực hiện các hàm tính toán tài chính (Gross/Net Revenue, Occupancy Rate) để đảm bảo số liệu hiển thị luôn chính xác theo thời gian thực.\n"
+                    "2. Quan hệ Mở rộng (<<extend>>): Định nghĩa 3 hành vi phân tích tùy chọn chỉ được kích hoạt dựa trên các điểm mở rộng (extension points) cụ thể tại use case trung tâm:\n"
+                    "   - 'Lọc theo suất diễn và khoảng ngày': Kích hoạt khi Ban tổ chức có nhu cầu phân tích thu hẹp phạm vi dữ liệu theo từng đêm diễn cụ thể hoặc lọc sâu theo giai đoạn mở bán vé.\n"
+                    "   - 'Xem chi tiết phân bổ doanh thu theo phân khu': Kích hoạt khi Ban tổ chức cần xem biểu đồ trực quan biểu diễn tỷ trọng đóng góp tài chính của từng hạng vé (VIP, CAT 1, CAT 2, Standing) so với tổng doanh thu gộp.\n"
+                    "   - 'Xuất báo cáo doanh thu': Kích hoạt khi người dùng muốn lưu trữ báo cáo ngoại tuyến dưới dạng tệp Excel hoặc in PDF để báo cáo nội bộ.",
+               "Giải thích nội dung biểu đồ: ")
+
     uc5_headers = ["Use Case", "Tác nhân", "Mô tả nghiệp vụ", "Quan hệ Use Case"]
     uc5_data = [
         ["Xem thống kê doanh thu sự kiện", "Ban tổ chức, Admin", "Ca sử dụng trung tâm: tiếp nhận yêu cầu, tổng hợp và hiển thị toàn bộ báo cáo doanh thu sự kiện.", "Chức năng chính"],
