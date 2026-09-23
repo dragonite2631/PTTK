@@ -298,16 +298,26 @@ Thiết kế giao diện cho **Chức năng 5: Xem thống kê doanh thu sự ki
 | `chart_zone` | Biểu đồ phân bổ phân khu | Donut Chart | Biểu đồ tròn trực quan tỷ trọng đóng góp doanh thu của từng phân khu vé. |
 | `tbl_breakdown`| Bảng chi tiết phân khu | Data Table | Liệt kê chi tiết từng phân khu: Đơn giá, Chỉ tiêu, Đã bán, Tỷ lệ lấp đầy, Doanh thu gộp, Tỷ trọng. |
 
-### 4.2. Kịch bản tương tác người dùng - hệ thống (UI Interaction Scenario)
+### 4.2. Kịch bản tương tác giao diện chi tiết (UI Storyboard Scenario)
 
-| Bước | Hành động của người dùng (User Action) | Phản hồi của hệ thống (System Response) |
-|:---:|:---|:---|
-| **1** | Người dùng truy cập vào mục 'Thống kê doanh thu' từ menu hệ thống. | Hệ thống tải giao diện `RevenueReportView`, nạp danh sách các sự kiện vào `cb_event`, đặt khoảng ngày mặc định là 30 ngày gần nhất. |
-| **2** | Người dùng nhấp vào `cb_event` và chọn sự kiện "Born Pink World Tour Hanoi 2026". | Hệ thống ghi nhận mã sự kiện `eventId`, tự động cập nhật ngày mở bán và ngày kết thúc sự kiện vào 2 ô DatePicker. |
-| **3** | Người dùng nhấp nút 'Tra cứu' (`btn_search`). | Giao diện hiển thị biểu tượng tải dữ liệu (loading spinner). Controller nạp Entity `RevenueReport`, kích hoạt chuỗi tính toán và trả về `RevenueSummaryDto`. |
-| **4** | Hệ thống nhận kết quả tính toán thành công. | Giao diện cập nhật tức thì 4 thẻ KPI, kết xuất biểu đồ Donut tỷ trọng doanh thu bên trái và điền đầy đủ dữ liệu vào bảng chi tiết phân khu bên phải. |
-| **5** | Người dùng rê chuột vào các phần của biểu đồ Donut. | Hệ thống hiển thị tooltip chi tiết: Tên phân khu, doanh thu thu được và tỷ lệ phần trăm đóng góp. |
-| **6** | Người dùng nhấp nút 'Xuất Excel' hoặc 'In PDF'. | Hệ thống gọi phương thức `exportExcel()` / `exportPdf()`, hiển thị hộp thoại tải tệp xuống máy tính của người dùng. |
+Kịch bản tương tác giao diện mô tả chi tiết từng bước hành động của người dùng trên màn hình `RevenueReportView`, sự kiện kích hoạt, cách thức hệ thống xử lý nghiệp vụ và phản hồi hiển thị tương ứng:
+
+| Bước | Hành động của tác nhân (User Action) | Sự kiện UI (Event) | Xử lý hệ thống & Phản hồi giao diện (System Response) | Trạng thái giao diện tiếp theo (Next State) |
+|:---:|:---|:---|:---|:---|
+| **1** | Người dùng nhấp chọn mục 'Thống kê doanh thu' trên menu điều khiển. | `OnClick` (Menu_ThongKe) | Hệ thống gọi API lấy danh sách các sự kiện đang hoạt động. Khởi tạo màn hình `RevenueReportView`, nạp danh sách sự kiện vào ComboBox (`cb_event`), đặt khoảng ngày tra cứu mặc định là 30 ngày gần nhất. | Màn hình hiển thị trống (Ready): Bộ lọc sẵn sàng, các thẻ KPI và bảng biểu ở trạng thái chờ. |
+| **2** | Người dùng nhấp vào ComboBox `cb_event` và chọn sự kiện "Born Pink World Tour Hanoi 2026". | `OnSelectionChange` (cb_event) | Hệ thống ghi nhận mã sự kiện `eventId`, tự động truy vấn khoảng thời gian diễn ra sự kiện trong CSDL và điền sẵn vào 2 ô DatePicker `dp_from_date` và `dp_to_date`. | Đã nạp bộ lọc (Configured): ComboBox hiển thị sự kiện đã chọn, các ô ngày hiển thị khoảng ngày của sự kiện. |
+| **3** | Người dùng điều chỉnh ô ngày và nhấp chuột vào nút 'Tra cứu' (`btn_search`). | `OnClick` (btn_search) | Giao diện vô hiệu hóa tạm thời bộ lọc (disable `cb_event`, `btn_search`) và hiển thị vòng xoay tải dữ liệu (loading spinner). Gửi yêu cầu truy vấn tài chính tới `RevenueReportController`. | Đang xử lý (Loading): Biểu tượng xoay hiển thị, người dùng không thể nhấp lại nút tra cứu. |
+| **4** | Hệ thống thực hiện tính toán tài chính thành công và trả về `RevenueSummaryDto`. | `OnDataLoaded` (Success Callback) | Ẩn biểu tượng xoay tải dữ liệu, kích hoạt lại bộ lọc. Nạp các giá trị số liệu vào 4 thẻ KPI; vẽ biểu đồ tròn Donut tỷ trọng phân khu; điền đầy đủ dữ liệu phân tích chi tiết vào bảng breakdown table. | Hiển thị báo cáo (Rendered): Toàn bộ số liệu doanh thu, biểu đồ phân khu và bảng phân tích chi tiết được hiển thị sắc nét. |
+| **5** | Người dùng di chuyển con trỏ chuột vào vùng phân khu 'VIP' trên biểu đồ tròn Donut. | `OnMouseHover` (chart_zone.VIP) | Biểu đồ Donut làm nổi bật khu vực VIP bằng hiệu ứng phóng to nhẹ (explode). Hệ thống hiển thị tooltip chi tiết: 'Phân khu: VIP \| Doanh thu: 7.000.000.000đ \| Tỷ trọng: 45.3%'. | Tương tác biểu đồ (Hovered): Tooltip chi tiết hiển thị động tại vị trí con trỏ chuột. |
+| **6** | Người dùng nhấp chuột vào nút 'Xuất Excel' (`btn_excel`). | `OnClick` (btn_excel) | Giao diện gửi yêu cầu kết xuất tệp tới Controller. Hệ thống tạo luồng byte của file Excel, thiết lập MIME-type và hiển thị hộp thoại tải xuống tệp 'Báo_cáo_doanh_thu_BornPink_2026.xlsx'. | Hiển thị báo cáo (Rendered): Quá trình tải xuống tệp báo cáo hoàn tất trong nền. |
+
+### 4.2.1. Các kịch bản kiểm lỗi và ràng buộc giao diện (UI Validation Scenarios)
+
+| Kịch bản ngoại lệ | Sự kiện kích hoạt (UI Event) | Xử lý lỗi & Phản hồi giao diện (System Response) | Trạng thái giao diện tiếp theo |
+|:---|:---|:---|:---|
+| **Người dùng nhập ngày bắt đầu lớn hơn ngày kết thúc (`dp_from_date > dp_to_date`)** | `OnClick` (btn_search) | Giao diện ngăn chặn gửi yêu cầu tra cứu xuống Controller. Ô viền `dp_from_date` và `dp_to_date` chuyển sang màu đỏ cảnh báo. Hệ thống hiển thị hộp thoại pop-up: 'Lỗi: Ngày bắt đầu tra cứu không thể sau ngày kết thúc!' | Cảnh báo lỗi bộ lọc (Error State): Hộp thoại hiển thị nút 'Đóng', người dùng phải sửa lại ngày. |
+| **Sự kiện được chọn chưa phát sinh bất kỳ giao dịch bán vé nào** | `OnClick` (btn_search) | Controller trả về kết quả rỗng (empty result). Giao diện ẩn biểu đồ tròn và bảng breakdown table, đặt giá trị các thẻ KPI về '0 VNĐ' và '0%'. Hiển thị thông báo màu xám trên màn hình: 'Sự kiện hiện tại chưa phát sinh giao dịch bán vé.' | Báo cáo rỗng (No Data State): Bộ lọc giữ nguyên trạng thái hoạt động để người dùng chọn sự kiện khác. |
+| **Mất kết nối mạng hoặc máy chủ cơ sở dữ liệu gặp sự cố** | `OnClick` (btn_search) | Hệ thống phát hiện lỗi kết nối (Timeout/Connection Refused). Giao diện ẩn loading spinner, hiển thị thông báo lỗi màu đỏ nổi bật: 'Mất kết nối tới máy chủ. Vui lòng kiểm tra lại đường truyền mạng hoặc liên hệ quản trị viên!' | Lỗi kết nối (Network Error): Giữ nguyên giao diện ban đầu để người dùng thử lại khi mạng ổn định. |
 
 ### 4.3. Bản vẽ thiết kế giao diện trực quan (UI Mockup Wireframe)
 
