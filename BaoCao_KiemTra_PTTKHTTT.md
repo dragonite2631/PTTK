@@ -806,6 +806,31 @@ classDiagram
 | `calculateZoneGross()` | `ZonePricing` | `double` | $\text{ZoneGross} = \text{price} \times \text{soldCount}$ (Doanh thu riêng của phân khu). |
 | `getSoldRate()` | `ZonePricing` | `double` | $\text{SoldRate} = \frac{\text{soldCount}}{\text{maxQuota}} \times 100\%$ (Tỷ lệ bán của phân khu). |
 
+#### e. Các ghi chú kiến trúc và thiết kế giải thích chi tiết sơ đồ (Architectural & Design Notes)
+
+1. **Khái niệm DTO (Data Transfer Object) và lý do áp dụng trong kiến trúc:**
+   * **Bản chất DTO:** `RevenueSummaryDto` và `ZoneRevenueDto` là các đối tượng truyền tải dữ liệu thuần túy (POJO) giữa tầng Điều khiển (`RevenueReportController`) và tầng Giao diện (`RevenueReportView`).
+   * **Lý do thiết kế:**
+     * *Tính đóng gói & Bảo mật (Security & Encapsulation):* DTO giúp che giấu cấu trúc bảng cơ sở dữ liệu và các trường nhạy cảm của Entity, không để lộ xuống tầng Presentation.
+     * *Làm phẳng dữ liệu & Tối ưu hiệu năng (Performance & Flattening):* Thay vì truyền các đối tượng Entity phức tạp có quan hệ liên kết vòng, Controller gọi các hàm tính toán của Entity, đóng gói toàn bộ kết quả (`grossRevenue`, `netRevenue`, `occupancyRate`, `performanceStatus`) vào một đối tượng DTO phẳng, nhẹ. Giao diện người dùng (UI) chỉ việc đọc các giá trị này để hiển thị lên thẻ KPI và vẽ biểu đồ mà không cần tính toán lại.
+     * *Khắc phục lỗi Lazy Loading trong ORM:* Trong JPA/Hibernate, việc truy cập các thuộc tính liên kết lười (Lazy) ngoài phạm vi Session/Transaction dễ dẫn đến ngoại lệ `LazyInitializationException`. DTO được khởi tạo bên trong ranh giới Service/Controller giải quyết triệt để lỗi này.
+
+2. **Phân tách vai trò theo mẫu thiết kế BCE (Boundary - Control - Entity):**
+   * `<<boundary>>` (`RevenueReportView`): Lớp giao diện người dùng, chịu trách nhiệm nhận sự kiện tương tác (chọn sự kiện từ ComboBox) và kết xuất dữ liệu DTO lên màn hình (KPI cards, biểu đồ tròn phân khu).
+   * `<<control>>` (`RevenueReportController`): Đóng vai trò điều phối luồng xử lý (Orchestrator). Controller **không trực tiếp chứa các công thức toán học tính tiền**, mà điều hướng: nhận yêu cầu từ View $\rightarrow$ nạp Entity $\rightarrow$ kích hoạt các hàm tính toán của Entity $\rightarrow$ đóng gói kết quả vào DTO $\rightarrow$ gửi trả View.
+   * `<<entity>>` (`RevenueReport`, `ZonePricing`, `Showtime`, `Event`): Lớp thực thể nghiệp vụ chứa dữ liệu và trực tiếp đóng gói các thuật toán tính toán (*Rich Domain Model*).
+   * `<<enumeration>>` (`PerformanceStatus`): Kiểu liệt kê định nghĩa tập hợp các giá trị đánh giá chuẩn mực (`EXCELLENT`, `GOOD`, `AVERAGE`, `POOR`).
+   * `<<dto>>` (`RevenueSummaryDto`): Đối tượng mang dữ liệu kết quả giữa Control và Boundary.
+
+3. **Giải quyết quan hệ N-N giữa Showtime và SeatZone thông qua lớp liên kết ZonePricing:**
+   * Mối quan hệ giữa Suất diễn (`Showtime`) và Phân khu ghế (`SeatZone`) về bản chất là quan hệ nhiều - nhiều ($*..*$). Tuy nhiên, tại mỗi suất diễn cụ thể, một phân khu sẽ có đơn giá vé riêng (`price`), chỉ tiêu phát hành riêng (`maxQuota`) và số vé đã bán thực tế riêng (`soldCount`).
+   * Do đó, lớp `ZonePricing` đóng vai trò là **Lớp liên kết nghiệp vụ (Association Class)**, phân rã quan hệ $*..*$ thành 2 quan hệ $1..*$:
+     $$\text{Showtime } (1) \longrightarrow (*) \text{ ZonePricing } (*) \longleftarrow (1) \text{ SeatZone}$$
+   * Thiết kế này loại bỏ hoàn toàn sự dư thừa liên kết (*Redundant Association*) và phản ánh chính xác nghiệp vụ bán vé theo từng đêm diễn.
+
+4. **Nguyên lý đóng gói hành vi tính toán (Information Expert - GRASP):**
+   * Theo nguyên lý *Information Expert*, trách nhiệm tính toán phải được gán cho lớp sở hữu đầy đủ thông tin nhất để thực hiện tính toán đó. Do `RevenueReport` chứa tập hợp các phân khu `ZonePricing` và thuế phí, việc đặt các phương thức `calculateGrossRevenue()`, `calculateNetRevenue()`, `calculateOccupancyRate()` trực tiếp trong `RevenueReport` đảm bảo lớp có cả **Trạng thái (State)** và **Hành vi (Behavior)**, đáp ứng tiêu chuẩn khắt khe của môn học, tránh mô hình *Anemic Domain Model*.
+
 ---
 
 ## 5. HƯỚNG DẪN NỘP BÀI VÀ THAY ĐỔI THÔNG TIN NHÓM

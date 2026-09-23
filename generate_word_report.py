@@ -527,6 +527,28 @@ def build_full_docx():
     ]
     add_styled_table(doc, calc_headers, calc_data, col_widths=[1.8, 1.1, 1.1, 2.5])
 
+    add_heading_3(doc, "e. Các ghi chú kiến trúc và thiết kế giải thích chi tiết sơ đồ (Architectural & Design Notes)")
+    
+    add_body_p(doc, "Trong sơ đồ lớp thiết kế, RevenueSummaryDto (Data Transfer Object) và ZoneRevenueDto là các đối tượng truyền tải dữ liệu thuần túy (POJO) giữa tầng Điều khiển (RevenueReportController) và tầng Giao diện (RevenueReportView). Việc sử dụng DTO mang lại 3 lợi ích kiến trúc cốt lõi:\n"
+                    "1. Tính đóng gói và bảo mật (Encapsulation & Security): DTO che giấu cấu trúc bảng cơ sở dữ liệu và các thông tin nghiệp vụ nội bộ nhạy cảm của Entity, không để lộ xuống tầng Presentation.\n"
+                    "2. Tối ưu hóa hiệu năng và làm phẳng dữ liệu (Flattening & Performance): Thay vì truyền các đối tượng Entity phức tạp có liên kết vòng, Controller gọi các hàm tính toán của Entity, đóng gói toàn bộ kết quả đã tính toán (Gross Revenue, Net Revenue, Occupancy Rate, Performance Status) vào một đối tượng DTO phẳng, nhẹ. Giao diện người dùng (UI) chỉ việc đọc các giá trị này để hiển thị lên thẻ KPI và vẽ biểu đồ mà không cần tính toán lại.\n"
+                    "3. Giải quyết vấn đề Lazy Loading trong ORM: Khi sử dụng các framework ORM (như Hibernate/JPA), việc truy cập các thuộc tính liên kết lười ngoài phạm vi Session/Transaction dễ dẫn đến lỗi LazyInitializationException. DTO được khởi tạo bên trong ranh giới Service/Controller giải quyết triệt để lỗi này.",
+               "1. Khái niệm DTO (Data Transfer Object) và lý do áp dụng: ")
+
+    add_body_p(doc, "Hệ thống áp dụng nghiêm ngặt mẫu phân rã trách nhiệm 3 lớp của Jacobson:\n"
+                    "• <<boundary>> (RevenueReportView): Lớp giao diện người dùng, chịu trách nhiệm nhận sự kiện tương tác (chọn sự kiện từ ComboBox) và kết xuất dữ liệu DTO lên màn hình (KPI cards, biểu đồ tròn phân khu).\n"
+                    "• <<control>> (RevenueReportController): Đóng vai trò điều phối luồng xử lý (Orchestrator). Controller không trực tiếp chứa các công thức toán học tính tiền, mà điều hướng: nhận yêu cầu từ View -> nạp Entity -> kích hoạt các hàm tính toán của Entity -> đóng gói kết quả vào DTO -> gửi trả View.\n"
+                    "• <<entity>> (RevenueReport, ZonePricing, Showtime, Event): Lớp thực thể nghiệp vụ chứa dữ liệu và trực tiếp đóng gói các thuật toán tính toán (Rich Domain Model).\n"
+                    "• <<enumeration>> (PerformanceStatus): Kiểu liệt kê định nghĩa tập hợp các giá trị đánh giá chuẩn mực (EXCELLENT, GOOD, AVERAGE, POOR).\n"
+                    "• <<dto>> (RevenueSummaryDto): Đối tượng mang dữ liệu kết quả giữa Control và Boundary.",
+               "2. Phân tách vai trò theo mẫu thiết kế BCE (Boundary - Control - Entity): ")
+
+    add_body_p(doc, "Mối quan hệ giữa Suất diễn (Showtime) và Phân khu ghế (SeatZone) về bản chất là quan hệ nhiều - nhiều (*..*). Tuy nhiên, tại mỗi suất diễn cụ thể, một phân khu sẽ có đơn giá vé riêng (price), chỉ tiêu phát hành riêng (maxQuota) và số vé đã bán thực tế riêng (soldCount). Do đó, lớp ZonePricing đóng vai trò là Lớp liên kết nghiệp vụ (Association Class), phân rã quan hệ *..* thành 2 quan hệ 1..* (Showtime 1 -> * ZonePricing * -> 1 SeatZone). Thiết kế này loại bỏ hoàn toàn sự dư thừa liên kết (Redundant Association) và phản ánh chính xác nghiệp vụ bán vé theo từng đêm diễn.",
+               "3. Giải quyết quan hệ N-N giữa Showtime và SeatZone: ")
+
+    add_body_p(doc, "Theo nguyên lý Information Expert của GRASP, trách nhiệm tính toán phải được gán cho lớp sở hữu đầy đủ thông tin nhất để thực hiện tính toán đó. Do RevenueReport chứa tập hợp các phân khu ZonePricing và thuế phí, việc đặt các phương thức calculateGrossRevenue(), calculateNetRevenue(), calculateOccupancyRate() trực tiếp trong RevenueReport đảm bảo lớp có cả Trạng thái (State) và Hành vi (Behavior), đáp ứng tiêu chuẩn khắt khe của môn học, tránh mô hình Anemic Domain Model.",
+               "4. Nguyên lý đóng gói hành vi tính toán (Information Expert): ")
+
     # Final summary conclusion
     add_heading_1(doc, "KẾT LUẬN VÀ CAM KẾT HOÀN THÀNH")
     add_body_p(doc, "Tài liệu phân tích và thiết kế hệ thống trên đã hoàn thiện đầy đủ 4 yêu cầu kiểm tra môn học theo đúng đề cương bài tập lớn do Thầy Nguyễn Đức Hiển giao:")

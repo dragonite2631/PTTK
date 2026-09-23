@@ -187,7 +187,7 @@ def gen_m5_detailed_class_diagram():
     ax.set_ylim(0, 950)
     ax.axis('off')
 
-    plt.title("BIỂU ĐỒ LỚP THIẾT KẾ CHI TIẾT (BCE) - CHỨC NĂNG: XEM THỐNG KÊ DOANH THU SỰ KIỆN",
+    plt.title("BIỂU ĐỒ LỚP THIẾT KẾ CHI TIẾT (BCE & DTO) - CHỨC NĂNG: XEM THỐNG KÊ DOANH THU SỰ KIỆN",
               fontsize=13, weight='bold', color='#1E3A8A', pad=15)
 
     # Row 1: Boundary, Control, Entity RevenueReport, Enum PerformanceStatus
@@ -195,15 +195,15 @@ def gen_m5_detailed_class_diagram():
                             ["- eventSelector: ComboBox", "- kpiPanel: Panel", "- zoneChart: ChartView"],
                             ["+ onSelectEvent(eventId: Long): void",
                              "+ displayKPIs(dto: RevenueSummaryDto): void",
-                             "+ renderZoneChart(data: List): void",
+                             "+ renderZoneChart(data: List<ZoneRevenueDto>): void",
                              "+ showError(msg: String): void"],
                             w=270, bg_hdr='#E0E7FF').place(40, 890)
 
     b_ctrl = DetailedUMLBox("control", "RevenueReportController",
                             ["- reportService: ReportService", "- eventRepo: EventRepository"],
                             ["+ handleViewReport(eventId: Long): RevenueSummaryDto",
-                             "+ calculateZoneAnalytics(eventId: Long): List",
-                             "+ formatReportData(report: RevenueReport): Dto"],
+                             "+ calculateZoneAnalytics(eventId: Long): List<ZoneRevenueDto>",
+                             "+ formatReportData(report: RevenueReport): RevenueSummaryDto"],
                             w=310, bg_hdr='#FEF08A', border='#CA8A04').place(360, 890)
 
     b_rep = DetailedUMLBox("entity", "RevenueReport",
@@ -225,13 +225,20 @@ def gen_m5_detailed_class_diagram():
 
     b_enum = DetailedUMLBox("enum", "PerformanceStatus",
                             ["EXCELLENT (>= 85%)", "GOOD (70% - 84%)", "AVERAGE (50% - 69%)", "POOR (< 50%)"],
-                            [], w=230, bg_hdr='#F1F5F9', border='#64748B').place(1160, 890)
+                            [], w=240, bg_hdr='#F1F5F9', border='#64748B').place(1150, 890)
 
-    # Row 2: Entity Event, ZonePricing, Showtime
-    b_ev = DetailedUMLBox("entity", "Event",
-                          ["- id: Long", "- title: String", "- status: EventStatus"],
-                          ["+ getTotalCapacity(): int", "+ getActiveShowtimes(): List<Showtime>"],
-                          w=270, bg_hdr='#BFDBFE').place(40, 480)
+    # Row 2: DTO, ZonePricing, Showtime, Event
+    b_dto = DetailedUMLBox("dto", "RevenueSummaryDto",
+                           ["- grossRevenue: double",
+                            "- netRevenue: double",
+                            "- occupancyRate: double",
+                            "- averagePrice: double",
+                            "- status: PerformanceStatus",
+                            "- zoneBreakdowns: List"],
+                           ["+ getGrossRevenue(): double",
+                            "+ getNetRevenue(): double",
+                            "+ getOccupancyRate(): double"],
+                           w=270, bg_hdr='#DCFCE7', border='#15803D').place(40, 480)
 
     b_zp = DetailedUMLBox("entity", "ZonePricing",
                           ["- id: Long", "- zoneName: String", "- price: double", "- maxQuota: int", "- soldCount: int"],
@@ -239,14 +246,19 @@ def gen_m5_detailed_class_diagram():
                            "+ calculateRemainingSeats(): int",
                            "+ getSoldRate(): double",
                            "+ isSoldOut(): boolean"],
-                          w=330, bg_hdr='#BFDBFE').place(360, 480)
+                          w=320, bg_hdr='#BFDBFE').place(360, 480)
 
     b_show = DetailedUMLBox("entity", "Showtime",
                             ["- id: Long", "- showDate: LocalDate", "- startTime: LocalTime"],
                             ["+ calculateShowtimeRevenue(): double", "+ getSoldTicketsCount(): int"],
-                            w=330, bg_hdr='#BFDBFE').place(760, 480)
+                            w=310, bg_hdr='#BFDBFE').place(740, 480)
 
-    boxes = [b_view, b_ctrl, b_rep, b_enum, b_ev, b_zp, b_show]
+    b_ev = DetailedUMLBox("entity", "Event",
+                          ["- id: Long", "- title: String", "- status: EventStatus"],
+                          ["+ getTotalCapacity(): int", "+ getActiveShowtimes(): List<Showtime>"],
+                          w=280, bg_hdr='#BFDBFE').place(1110, 480)
+
+    boxes = [b_view, b_ctrl, b_rep, b_enum, b_dto, b_zp, b_show, b_ev]
     for b in boxes:
         b.draw(ax)
 
@@ -255,9 +267,12 @@ def gen_m5_detailed_class_diagram():
     draw_dependency(ax, b_ctrl.right, b_rep.left, label="invokes")
     draw_dependency(ax, b_rep.right, b_enum.left, label="evaluates to")
 
+    draw_dependency(ax, b_ctrl.pt('bottom', -50), b_dto.top, label="creates DTO")
+    draw_dependency(ax, b_dto.pt('top', -40), b_view.bottom, label="displays")
+
     draw_assoc(ax, b_rep.pt('bottom', -80), b_zp.top, mult1="1", mult2="*", label="aggregates")
     draw_assoc(ax, b_rep.pt('bottom', 80), b_show.top, mult1="1", mult2="*", label="summarizes")
-    draw_assoc(ax, b_ev.right, b_zp.left, mult1="1", mult2="*")
+    draw_assoc(ax, b_ev.left, b_show.right, mult1="1", mult2="*")
 
     plt.tight_layout()
     path = os.path.join(OUTPUT_DIR, "design_m5_view_revenue_detail.png")
@@ -414,7 +429,7 @@ def gen_m5_analysis_class_diagram():
     draw_assoc(ax, b_rep.bottom, b_zp.top, mult1="1", mult2="*", label="aggregates")
     draw_assoc(ax, b_rep.right, b_show.left, mult1="1", mult2="*", label="summarizes")
     draw_assoc(ax, b_zp.right, b_sz.left, mult1="*", mult2="1", label="maps to")
-    draw_assoc(ax, b_show.bottom, b_sz.top, mult1="*", mult2="*", label="arranges")
+    draw_assoc(ax, b_show.bottom, b_zp.pt('right', 30), mult1="1", mult2="*", label="prices via")
 
     plt.tight_layout()
     path = os.path.join(OUTPUT_DIR, "analysis_m5_view_revenue_detail.png")
