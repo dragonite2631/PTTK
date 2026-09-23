@@ -409,6 +409,10 @@ def build_full_docx():
     add_body_p(doc, "Organizer quản lý nhiều Event, mỗi sự kiện áp dụng SeatMap và nhiều Showtime, từ đó thiết lập ZonePricing và kết xuất RevenueReport.")
     add_diagram_image(doc, "analysis_module5.png", "Hình 3.6: Biểu đồ lớp thực thể phân tích - Phân hệ 5: Quản lý & Thống kê BTC")
 
+    add_heading_3(doc, "3.6.1. Biểu đồ lớp phân tích chi tiết cho chức năng Xem thống kê doanh thu sự kiện")
+    add_body_p(doc, "Để đáp ứng nguyên tắc hướng đối tượng cốt lõi (Lớp phải đóng gói trạng thái và hành vi tính toán nghiệp vụ, không chỉ là tập hợp dữ liệu thụ động/Anemic Domain Model), biểu đồ lớp phân tích dưới đây thể hiện chi tiết các thực thể tham gia ca sử dụng đơn lẻ 'Xem thống kê doanh thu sự kiện' cùng các phương thức tính toán tài chính trọng tâm:")
+    add_diagram_image(doc, "analysis_m5_view_revenue_detail.png", "Hình 3.7: Biểu đồ lớp phân tích chi tiết - Chức năng Xem thống kê doanh thu sự kiện")
+
     # =========================================================================
     # PHẦN 4
     # =========================================================================

@@ -394,6 +394,95 @@ classDiagram
 
 ---
 
+### 3.3. Biểu đồ lớp phân tích chi tiết cho chức năng trọng tâm: Xem thống kê doanh thu sự kiện
+
+Để giải quyết triệt để yêu cầu: *"Nếu là class thì cần có các phương thức thực hiện tính toán, nếu không chỉ là nhóm dữ liệu không được coi là class"*, biểu đồ lớp phân tích dưới đây thể hiện toàn diện các phương thức tính toán tài chính của các thực thể tham gia ca sử dụng này:
+
+```mermaid
+classDiagram
+    class Organizer {
+        <<analysis>>
+        userId
+        companyName
+        taxId
+        email
+        +selectEvent()
+        +viewRevenueReport()
+    }
+
+    class Event {
+        <<analysis>>
+        eventId
+        title
+        category
+        status
+        +getTotalCapacity()
+        +getShowtimes()
+    }
+
+    class RevenueReport {
+        <<analysis>>
+        reportId
+        eventId
+        calculatedAt
+        taxRate
+        platformFeeRate
+        totalTicketsSold
+        grossRevenue
+        netRevenue
+        occupancyRate
+        +calculateTotalCapacity()
+        +calculateTotalTicketsSold()
+        +calculateGrossRevenue()
+        +calculateNetRevenue()
+        +calculateOccupancyRate()
+        +calculateAverageTicketPrice()
+        +calculateZoneContribution(zoneId)
+        +evaluatePerformance()
+    }
+
+    class ZonePricing {
+        <<analysis>>
+        pricingId
+        zoneName
+        price
+        maxQuota
+        soldCount
+        +calculateZoneGross()
+        +calculateRemainingSeats()
+        +getSoldRate()
+    }
+
+    class Showtime {
+        <<analysis>>
+        showtimeId
+        showDate
+        startTime
+        endTime
+        +calculateShowtimeRevenue()
+        +getSoldTicketsCount()
+    }
+
+    class SeatZone {
+        <<analysis>>
+        zoneId
+        zoneName
+        colorHex
+        seatCount
+        +countTotalSeats()
+    }
+
+    Organizer "1" --> "*" Event : manages
+    Organizer "1" --> "*" RevenueReport : requests
+    Event "1" --> "*" ZonePricing : configures
+    RevenueReport "1" --> "*" ZonePricing : aggregates
+    RevenueReport "1" --> "*" Showtime : summarizes
+    ZonePricing "*" --> "1" SeatZone : maps to
+    Showtime "*" --> "*" SeatZone : arranges
+```
+
+---
+
 ## 4. BIỂU ĐỒ LỚP THỰC THỂ THIẾT KẾ CHO HỆ THỐNG VÀ CHO CÁC CHỨC NĂNG
 
 ### Nguyên lý lớp thiết kế (Design Entity Classes)

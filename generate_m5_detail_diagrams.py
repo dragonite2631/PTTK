@@ -274,11 +274,87 @@ def gen_m5_sequence_diagram():
     plt.close()
     print("Saved:", path)
 
+def gen_m5_analysis_class_diagram():
+    fig, ax = plt.subplots(figsize=(14, 9.5), dpi=220)
+    ax.set_xlim(0, 1400)
+    ax.set_ylim(0, 950)
+    ax.axis('off')
+
+    plt.title("BIỂU ĐỒ LỚP PHÂN TÍCH (ANALYSIS CLASS DIAGRAM) - CHỨC NĂNG: XEM THỐNG KÊ DOANH THU SỰ KIỆN",
+              fontsize=12.5, weight='bold', color='#1E3A8A', pad=15)
+
+    # 1. Organizer (Actor / Entity)
+    b_org = DetailedUMLBox("analysis", "Organizer",
+                           ["userId", "companyName", "taxId", "email"],
+                           ["+ selectEvent()", "+ viewRevenueReport()"],
+                           w=260, bg_hdr='#DBEAFE', border='#1E3A8A').place(50, 890)
+
+    # 2. Event (Entity)
+    b_ev = DetailedUMLBox("analysis", "Event",
+                          ["eventId", "title", "category", "status"],
+                          ["+ getTotalCapacity()", "+ getShowtimes()"],
+                          w=260, bg_hdr='#DBEAFE', border='#1E3A8A').place(50, 520)
+
+    # 3. RevenueReport (Core Entity with computational methods)
+    b_rep = DetailedUMLBox("analysis", "RevenueReport",
+                           ["reportId", "eventId", "calculatedAt", "taxRate", "platformFeeRate",
+                            "totalTicketsSold", "grossRevenue", "netRevenue", "occupancyRate"],
+                           ["+ calculateTotalCapacity()",
+                            "+ calculateTotalTicketsSold()",
+                            "+ calculateGrossRevenue()",
+                            "+ calculateNetRevenue()",
+                            "+ calculateOccupancyRate()",
+                            "+ calculateAverageTicketPrice()",
+                            "+ calculateZoneContribution(zoneId)",
+                            "+ evaluatePerformance()"],
+                           w=380, bg_hdr='#BFDBFE', border='#1E3A8A').place(440, 890)
+
+    # 4. ZonePricing (Entity with calculations)
+    b_zp = DetailedUMLBox("analysis", "ZonePricing",
+                          ["pricingId", "zoneName", "price", "maxQuota", "soldCount"],
+                          ["+ calculateZoneGross()",
+                           "+ calculateRemainingSeats()",
+                           "+ getSoldRate()"],
+                          w=310, bg_hdr='#DBEAFE', border='#1E3A8A').place(440, 420)
+
+    # 5. Showtime (Entity with calculations)
+    b_show = DetailedUMLBox("analysis", "Showtime",
+                            ["showtimeId", "showDate", "startTime", "endTime"],
+                            ["+ calculateShowtimeRevenue()",
+                             "+ getSoldTicketsCount()"],
+                            w=310, bg_hdr='#DBEAFE', border='#1E3A8A').place(930, 890)
+
+    # 6. SeatZone (Entity)
+    b_sz = DetailedUMLBox("analysis", "SeatZone",
+                          ["zoneId", "zoneName", "colorHex", "seatCount"],
+                          ["+ countTotalSeats()"],
+                          w=310, bg_hdr='#DBEAFE', border='#1E3A8A').place(930, 420)
+
+    boxes = [b_org, b_ev, b_rep, b_zp, b_show, b_sz]
+    for b in boxes:
+        b.draw(ax)
+
+    # Relationships
+    draw_assoc(ax, b_org.bottom, b_ev.top, mult1="1", mult2="*", label="manages")
+    draw_assoc(ax, b_org.right, b_rep.left, mult1="1", mult2="*", label="requests")
+    draw_assoc(ax, b_ev.right, b_zp.left, mult1="1", mult2="*", label="configures")
+    draw_assoc(ax, b_rep.bottom, b_zp.top, mult1="1", mult2="*", label="aggregates")
+    draw_assoc(ax, b_rep.right, b_show.left, mult1="1", mult2="*", label="summarizes")
+    draw_assoc(ax, b_zp.right, b_sz.left, mult1="*", mult2="1", label="maps to")
+    draw_assoc(ax, b_show.bottom, b_sz.top, mult1="*", mult2="*", label="arranges")
+
+    plt.tight_layout()
+    path = os.path.join(OUTPUT_DIR, "analysis_m5_view_revenue_detail.png")
+    plt.savefig(path, bbox_inches='tight')
+    plt.close()
+    print("Saved:", path)
+
 def main():
-    print("Generating detailed design diagrams for Module 5 key use case...")
+    print("Generating detailed design and analysis diagrams for Module 5 key use case...")
+    gen_m5_analysis_class_diagram()
     gen_m5_detailed_class_diagram()
     gen_m5_sequence_diagram()
-    print("Done generating M5 key use case design diagrams!")
+    print("Done generating M5 key use case diagrams!")
 
 if __name__ == "__main__":
     main()
