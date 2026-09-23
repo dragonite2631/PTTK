@@ -582,16 +582,154 @@ classDiagram
 | Lớp thiết kế | Thuộc tính chi tiết (Kiểu dữ liệu & Ràng buộc) | Phương thức nghiệp vụ (Operations) |
 |:---|:---|:---|
 | **Organizer** | `- id: Long [PK]`<br>`- companyName: String`<br>`- taxId: String`<br>`- email: String` | `+ createEvent(dto: EventDto): Event`<br>`+ updatePricing(pricingDto): void`<br>`+ viewReports(eventId: Long): RevenueReport` |
-| **ZonePricing** | `- id: Long [PK]`<br>`- price: double [>= 0]`<br>`- maxQuota: int`<br>`- soldCount: int` | `+ isSoldOut(): boolean`<br>`+ recordSale(qty: int): void`<br>`+ getRemainingQuota(): int` |
-| **RevenueReport**| `- id: Long [PK]`<br>`- totalTicketsSold: int`<br>`- grossRevenue: double`<br>`- occupancyRate: double [0.0 - 100.0%]`<br>`- generatedAt: LocalDateTime` | `+ exportExcel(): byte[]`<br>`+ exportPdf(): byte[]`<br>`+ calculateRevenueByZone(): Map` |
+| **ZonePricing** | `- id: Long [PK]`<br>`- price: double [>= 0]`<br>`- maxQuota: int`<br>`- soldCount: int` | `+ calculateZoneGross(): double`<br>`+ calculateRemainingSeats(): int`<br>`+ getSoldRate(): double`<br>`+ isSoldOut(): boolean`<br>`+ recordSale(qty: int): void` |
+| **RevenueReport**| `- id: Long [PK]`<br>`- eventId: Long`<br>`- calculatedAt: LocalDateTime`<br>`- taxRate: double`<br>`- platformCommissionRate: double` | `+ calculateTotalCapacity(): int`<br>`+ calculateTotalTicketsSold(): int`<br>`+ calculateGrossRevenue(): double`<br>`+ calculateNetRevenue(): double`<br>`+ calculateOccupancyRate(): double`<br>`+ calculateAverageTicketPrice(): double`<br>`+ calculateZoneContribution(zoneId: Long): double`<br>`+ evaluatePerformance(): PerformanceStatus`<br>`+ exportExcel(): byte[]`<br>`+ exportPdf(): byte[]` |
+
+---
+
+### 4.3. Thiết kế chi tiết chức năng trọng tâm Module 5: Xem thống kê doanh thu sự kiện (View Event Revenue Statistics)
+
+* **Lý do lựa chọn:** Đây là chức năng đơn lẻ (Single Atomic Function - Read/Calculate Analytics) cốt lõi của Module 5. Chức năng yêu cầu các lớp thực thể phải đóng gói đầy đủ **các phương thức thực hiện tính toán tài chính nghiệp vụ**, đảm bảo không biến lớp thành cấu trúc dữ liệu thụ động (*Anemic Domain Model*).
+
+#### a. Đặc tả ca sử dụng chi tiết (Use Case Specification)
+| Thuộc tính | Nội dung chi tiết |
+|:---|:---|
+| **Tên chức năng** | **Xem thống kê doanh thu sự kiện (View Event Revenue Statistics)** |
+| **Tác nhân** | Ban tổ chức sự kiện (`Organizer`), Quản trị viên (`Admin`) |
+| **Tiền điều kiện** | 1. Ban tổ chức đã đăng nhập vào hệ thống.<br>2. Sự kiện đã mở bán và phát sinh giao dịch đặt vé. |
+| **Hậu điều kiện** | Hiển thị bảng tổng kết các chỉ số tài chính (KPIs) và biểu đồ phân bổ doanh thu theo phân khu. |
+| **Luồng sự kiện chính** | 1. Ban tổ chức chọn sự kiện cần xem báo cáo.<br>2. Giao diện `RevenueReportView` gửi yêu cầu đến `RevenueReportController`.<br>3. Controller khởi tạo đối tượng `RevenueReport` nạp các phân khu `ZonePricing`.<br>4. `RevenueReport` gọi chuỗi phương thức tính toán: `calculateGrossRevenue()`, `calculateNetRevenue()`, `calculateOccupancyRate()`, `evaluatePerformance()`.<br>5. Controller chuyển đổi dữ liệu kết quả thành `RevenueSummaryDto` trả về View.<br>6. View hiển thị các thẻ KPI và biểu đồ doanh thu trực quan. |
+
+#### b. Biểu đồ tuần tự (Sequence Diagram)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Org as Ban tổ chức
+    participant V as :RevenueReportView
+    participant C as :RevenueReportController
+    participant R as report:RevenueReport
+    participant Z as p:ZonePricing
+
+    Org->>V: onSelectEvent(eventId)
+    V->>C: handleViewReport(eventId)
+    C->>R: <<create>> (eventId, taxRate, feeRate)
+    
+    rect rgb(240, 248, 255)
+        note over R,Z: Quá trình tính toán nội tại trong Entity
+        C->>R: calculateGrossRevenue()
+        loop Duyệt từng phân khu ZonePricing
+            R->>Z: calculateZoneGross()
+            Z-->>R: zoneGrossAmount
+        end
+        C->>R: calculateNetRevenue()
+        C->>R: calculateOccupancyRate()
+        C->>R: evaluatePerformance()
+        R-->>C: PerformanceStatus (EXCELLENT/GOOD...)
+    end
+
+    C->>C: formatReportData()
+    C-->>V: return RevenueSummaryDto
+    V-->>Org: renderKPIs & showZoneCharts()
+```
+
+#### c. Biểu đồ lớp thiết kế chi tiết (Mô hình BCE)
+```mermaid
+classDiagram
+    class RevenueReportView {
+        <<boundary>>
+        -eventSelector: ComboBox
+        -kpiPanel: Panel
+        -zoneChart: ChartView
+        +onSelectEvent(eventId: Long) void
+        +displayKPIs(dto: RevenueSummaryDto) void
+        +renderZoneChart(data: List) void
+        +showError(msg: String) void
+    }
+
+    class RevenueReportController {
+        <<control>>
+        -reportService: ReportService
+        -eventRepo: EventRepository
+        +handleViewReport(eventId: Long) RevenueSummaryDto
+        +calculateZoneAnalytics(eventId: Long) List
+        +formatReportData(report: RevenueReport) Dto
+    }
+
+    class RevenueReport {
+        <<entity>>
+        -reportId: Long
+        -eventId: Long
+        -calculatedAt: LocalDateTime
+        -taxRate: double
+        -platformCommissionRate: double
+        +calculateTotalCapacity() int
+        +calculateTotalTicketsSold() int
+        +calculateGrossRevenue() double
+        +calculateNetRevenue() double
+        +calculateOccupancyRate() double
+        +calculateAverageTicketPrice() double
+        +calculateZoneContribution(zoneId: Long) double
+        +evaluatePerformance() PerformanceStatus
+    }
+
+    class ZonePricing {
+        <<entity>>
+        -id: Long
+        -zoneName: String
+        -price: double
+        -maxQuota: int
+        -soldCount: int
+        +calculateZoneGross() double
+        +calculateRemainingSeats() int
+        +getSoldRate() double
+        +isSoldOut() boolean
+    }
+
+    class Showtime {
+        <<entity>>
+        -id: Long
+        -showDate: LocalDate
+        -startTime: LocalTime
+        +calculateShowtimeRevenue() double
+        +getSoldTicketsCount() int
+    }
+
+    class PerformanceStatus {
+        <<enumeration>>
+        EXCELLENT
+        GOOD
+        AVERAGE
+        POOR
+    }
+
+    RevenueReportView ..> RevenueReportController : triggers
+    RevenueReportController ..> RevenueReport : invokes
+    RevenueReport "1" --> "*" ZonePricing : aggregates
+    RevenueReport "1" --> "*" Showtime : summarizes
+    RevenueReport ..> PerformanceStatus : evaluates to
+```
+
+#### d. Bảng chi tiết các phương thức thực hiện tính toán (Computational Methods)
+| Tên phương thức | Lớp sở hữu | Kiểu trả về | Công thức & Thuật toán tính toán |
+|:---|:---|:---:|:---|
+| `calculateTotalCapacity()` | `RevenueReport` | `int` | $\text{TotalCapacity} = \sum \text{zone.seatCount}$ (Tổng số ghế phát hành của tất cả các khu vực). |
+| `calculateTotalTicketsSold()` | `RevenueReport` | `int` | $\text{TotalSold} = \sum \text{zone.soldCount}$ (Tổng số vé đã bán thành công). |
+| `calculateGrossRevenue()` | `RevenueReport` | `double` | $\text{GrossRevenue} = \sum (\text{zone.soldCount} \times \text{zone.price})$ (Doanh thu bán vé gộp). |
+| `calculateNetRevenue()` | `RevenueReport` | `double` | $\text{NetRevenue} = \text{GrossRevenue} \times (1 - \text{taxRate} - \text{platformFeeRate})$ (Doanh thu thuần sau thuế và phí sàn). |
+| `calculateOccupancyRate()` | `RevenueReport` | `double` | $\text{OccupancyRate} = \frac{\text{TotalSold}}{\text{TotalCapacity}} \times 100\%$ (Tỷ lệ lấp đầy sân khấu). |
+| `calculateAverageTicketPrice()` | `RevenueReport` | `double` | $\text{AvgPrice} = \frac{\text{GrossRevenue}}{\text{TotalSold}}$ (Giá vé bình quân thực tế). |
+| `calculateZoneContribution(zoneId)` | `RevenueReport` | `double` | $\text{Contribution} = \frac{\text{ZoneGross}}{\text{GrossRevenue}} \times 100\%$ (Tỷ trọng doanh thu theo từng phân khu). |
+| `evaluatePerformance()` | `RevenueReport` | `Enum` | Phân loại hiệu quả tài chính:<br>• $\ge 85\%$: `EXCELLENT` (Cháy vé)<br>• $70\% - 84\%$: `GOOD` (Đạt chỉ tiêu)<br>• $50\% - 69\%$: `AVERAGE` (Hòa vốn)<br>• $< 50\%$: `POOR` (Cần giải cứu) |
+| `calculateZoneGross()` | `ZonePricing` | `double` | $\text{ZoneGross} = \text{price} \times \text{soldCount}$ (Doanh thu riêng của phân khu). |
+| `getSoldRate()` | `ZonePricing` | `double` | $\text{SoldRate} = \frac{\text{soldCount}}{\text{maxQuota}} \times 100\%$ (Tỷ lệ bán của phân khu). |
 
 ---
 
 ## 5. HƯỚNG DẪN NỘP BÀI VÀ THAY ĐỔI THÔNG TIN NHÓM
 
 1. **Tệp tài liệu nộp Thầy Hiển:**
-   * Tệp Word đã hoàn chỉnh sẵn sàng để gửi: **`PTTK/N12 Nhóm 01 - HoanChinh.docx`** (hoặc bạn có thể đóng ứng dụng Microsoft Word đang mở và đổi tên thành `N12 Nhóm 01.docx`).
-   * Thư mục chứa toàn bộ 18 ảnh sơ đồ chất lượng cao (300 DPI): `PTTK/diagrams/`.
+   * Tệp Word chính thức đã nhúng đầy đủ 20 sơ đồ: **`PTTK/N12 Nhóm 01.docx`**.
+   * Thư mục chứa toàn bộ ảnh sơ đồ chất lượng cao (300 DPI): `PTTK/diagrams/`.
 2. **Email nhận bài:** `ndhien@hotmail.com`
 3. **Tiêu đề email & tên tệp:** `N12<Nhóm Mã số>.docx` (Ví dụ: `N12 Nhóm 01.docx`).
 4. **Cách thay đổi mã nhóm hoặc họ tên thành viên trong 1 câu lệnh:**

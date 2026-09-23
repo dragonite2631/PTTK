@@ -492,10 +492,53 @@ def build_full_docx():
     d5_headers = ["Lớp thiết kế", "Thuộc tính chi tiết (Kiểu dữ liệu & Ràng buộc)", "Phương thức nghiệp vụ (Operations)"]
     d5_data = [
         ["Organizer", "- id: Long [PK]\n- companyName: String\n- taxId: String [Unique]\n- email: String", "+ createEvent(dto: EventDto): Event\n+ updatePricing(pricingDto): void\n+ viewReports(eventId: Long): RevenueReport"],
-        ["ZonePricing", "- id: Long [PK]\n- price: double [>= 0]\n- maxQuota: int [Total Allocated Seats]\n- soldCount: int [Current Sold Seats]", "+ isSoldOut(): boolean\n+ recordSale(quantity: int): void\n+ getRemainingQuota(): int"],
-        ["RevenueReport", "- id: Long [PK]\n- totalTicketsSold: int\n- grossRevenue: double\n- occupancyRate: double [0.0 - 100.0%]\n- generatedAt: LocalDateTime", "+ exportExcel(): byte[]\n+ exportPdf(): byte[]\n+ calculateRevenueByZone(): Map"]
+        ["ZonePricing", "- id: Long [PK]\n- price: double [>= 0]\n- maxQuota: int [Total Allocated Seats]\n- soldCount: int [Current Sold Seats]", "+ calculateZoneGross(): double\n+ calculateRemainingSeats(): int\n+ getSoldRate(): double\n+ isSoldOut(): boolean\n+ recordSale(quantity: int): void"],
+        ["RevenueReport", "- id: Long [PK]\n- eventId: Long\n- calculatedAt: LocalDateTime\n- taxRate: double\n- platformCommissionRate: double", "+ calculateTotalCapacity(): int\n+ calculateTotalTicketsSold(): int\n+ calculateGrossRevenue(): double\n+ calculateNetRevenue(): double\n+ calculateOccupancyRate(): double\n+ calculateAverageTicketPrice(): double\n+ calculateZoneContribution(zoneId: Long): double\n+ evaluatePerformance(): PerformanceStatus\n+ exportExcel(): byte[]\n+ exportPdf(): byte[]"]
     ]
     add_styled_table(doc, d5_headers, d5_data, col_widths=[1.5, 2.5, 2.5])
+
+    # Module 5 Key Use Case Detailed Design
+    add_heading_2(doc, "4.7. Thiết kế chi tiết chức năng trọng tâm Module 5: Xem thống kê doanh thu sự kiện")
+    add_body_p(doc, "Trong Module 5, chức năng 'Xem thống kê doanh thu sự kiện' (View Event Revenue Statistics) là một chức năng nghiệp vụ đơn lẻ (Single Atomic Function - Read/Calculate Analytics) đóng vai trò quyết định hiệu quả kinh doanh của Ban tổ chức. Chức năng này không đơn thuần là truy vấn dữ liệu thô (DTO) mà đòi hỏi các lớp thực thể phải sở hữu các phương thức thực hiện tính toán tài chính phức tạp, đảm bảo tính đóng gói (Encapsulation) chuẩn mực của lập trình hướng đối tượng.", "Lý do lựa chọn chức năng: ")
+
+    add_heading_3(doc, "a. Đặc tả ca sử dụng chi tiết (Use Case Specification)")
+    uc_spec_headers = ["Thuộc tính đặc tả", "Nội dung chi tiết"]
+    uc_spec_data = [
+        ["Tên chức năng / Use Case", "Xem thống kê doanh thu sự kiện (View Event Revenue Statistics)"],
+        ["Phân hệ trực thuộc", "Module 5: Quản lý và thống kê dành cho Ban tổ chức"],
+        ["Tác nhân (Actor)", "Ban tổ chức sự kiện (Organizer), Quản trị viên (Admin)"],
+        ["Mục tiêu nghiệp vụ", "Cung cấp bức tranh tài chính toàn cảnh của sự kiện: doanh thu gộp, doanh thu thuần sau thuế và phí sàn, tỷ lệ lấp đầy khán đài, giá vé bình quân và xếp hạng hiệu suất mở bán."],
+        ["Tiền điều kiện (Pre-conditions)", "1. Ban tổ chức đã đăng nhập thành công vào hệ thống.\n2. Sự kiện đã được cấu hình sơ đồ ghế và đã phát sinh giao dịch bán vé."],
+        ["Hậu điều kiện (Post-conditions)", "Hệ thống tổng hợp và hiển thị trực quan các chỉ số tài chính (KPIs) cùng biểu đồ phân bổ doanh thu theo từng khu vực khán đài."],
+        ["Luồng sự kiện chính (Main Flow)", "1. Ban tổ chức chọn sự kiện cần xem từ danh sách sự kiện do mình quản lý.\n2. Giao diện RevenueReportView gửi yêu cầu tra cứu tới RevenueReportController.\n3. Controller khởi tạo đối tượng RevenueReport nạp dữ liệu cấu hình vé và các giao dịch.\n4. RevenueReport thực hiện chuỗi phương thức tính toán nội tại: calculateGrossRevenue(), calculateNetRevenue(), calculateOccupancyRate(), evaluatePerformance().\n5. Controller đóng gói kết quả vào RevenueSummaryDto và trả về cho RevenueReportView.\n6. Giao diện kết xuất các thẻ KPI và biểu đồ phân bổ doanh thu trực quan."]
+    ]
+    add_styled_table(doc, uc_spec_headers, uc_spec_data, col_widths=[2.2, 4.3])
+
+    add_heading_3(doc, "b. Biểu đồ tuần tự (Sequence Diagram) thể hiện tương tác BCE")
+    add_body_p(doc, "Biểu đồ tuần tự thể hiện sự tương tác mạch lạc giữa tác nhân Ban tổ chức, lớp Boundary (Giao diện), lớp Control (Điều phối) và các lớp Entity (Thực thể tính toán):")
+    add_diagram_image(doc, "seq_m5_view_revenue.png", "Hình 4.7: Biểu đồ tuần tự ca sử dụng Xem thống kê doanh thu sự kiện")
+
+    add_heading_3(doc, "c. Biểu đồ lớp thiết kế chi tiết theo mô hình BCE")
+    add_body_p(doc, "Mô hình thiết kế 3 lớp (Boundary - Control - Entity) làm nổi bật các phương thức tính toán nghiệp vụ trong các lớp thực thể RevenueReport và ZonePricing:")
+    add_diagram_image(doc, "design_m5_view_revenue_detail.png", "Hình 4.8: Biểu đồ lớp thiết kế chi tiết (BCE) chức năng Thống kê doanh thu")
+
+    add_heading_3(doc, "d. Bảng phân tích chi tiết các phương thức tính toán (Computational Methods)")
+    add_body_p(doc, "Để các lớp không bị biến thành 'cấu trúc dữ liệu thụ động' (Anemic Domain Model), toàn bộ logic tính toán tài chính được đóng gói trực tiếp vào các thực thể:")
+
+    calc_headers = ["Tên phương thức tính toán", "Lớp sở hữu", "Kiểu trả về", "Công thức / Thuật toán tính toán"]
+    calc_data = [
+        ["calculateTotalCapacity()", "RevenueReport", "int", "Tổng sức chứa của khán đài = tổng số ghế của tất cả các phân khu (ZonePricing):\nTotalCapacity = sum(zone.seatCount)"],
+        ["calculateTotalTicketsSold()", "RevenueReport", "int", "Tổng số vé thực tế đã bán thành công = tổng số vé bán ra của từng phân khu:\nTotalSold = sum(zone.soldCount)"],
+        ["calculateGrossRevenue()", "RevenueReport", "double", "Tổng doanh thu gộp = tổng tích số giữa số vé đã bán và đơn giá vé từng khu vực:\nGrossRevenue = sum(zone.soldCount * zone.price)"],
+        ["calculateNetRevenue()", "RevenueReport", "double", "Doanh thu thuần thực nhận sau khi khấu trừ thuế VAT và phí nền tảng:\nNetRevenue = GrossRevenue * (1 - taxRate - platformFeeRate)"],
+        ["calculateOccupancyRate()", "RevenueReport", "double", "Tỷ lệ lấp đầy khán đài theo phần trăm:\nOccupancyRate = (TotalSold / (double) TotalCapacity) * 100.0%"],
+        ["calculateAverageTicketPrice()", "RevenueReport", "double", "Giá vé bình quân trên mỗi vé bán ra:\nAvgPrice = TotalSold > 0 ? (GrossRevenue / TotalSold) : 0.0"],
+        ["calculateZoneContribution(zoneId)", "RevenueReport", "double", "Tỷ trọng đóng góp doanh thu của một khu vực so với tổng doanh thu:\nContribution = (ZoneGross / GrossRevenue) * 100.0%"],
+        ["evaluatePerformance()", "RevenueReport", "PerformanceStatus", "Đánh giá phân loại sức mua theo thang tỷ lệ lấp đầy:\n- Occupancy >= 85%: EXCELLENT (Cháy vé)\n- 70% <= Occupancy < 85%: GOOD (Đạt chỉ tiêu)\n- 50% <= Occupancy < 70%: AVERAGE (Hòa vốn)\n- Occupancy < 50%: POOR (Cần giải cứu vé)"],
+        ["calculateZoneGross()", "ZonePricing", "double", "Doanh thu của riêng phân khu vé = price * soldCount"],
+        ["getSoldRate()", "ZonePricing", "double", "Tỷ lệ bán của riêng phân khu = (soldCount / (double) maxQuota) * 100.0%"]
+    ]
+    add_styled_table(doc, calc_headers, calc_data, col_widths=[1.8, 1.1, 1.1, 2.5])
 
     # Final summary conclusion
     add_heading_1(doc, "KẾT LUẬN VÀ CAM KẾT HOÀN THÀNH")
