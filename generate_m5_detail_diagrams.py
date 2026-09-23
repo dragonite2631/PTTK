@@ -91,6 +91,79 @@ class DetailedUMLBox:
                     fontsize=8.0, color=color, weight=weight, fontfamily='Consolas', zorder=5)
             cur_y -= self.line_h
 
+def draw_uc_actor(ax, x, y, name, color='#1E3A8A'):
+    circle = patches.Circle((x, y + 25), 12, edgecolor=color, facecolor='#DBEAFE', lw=2, zorder=5)
+    ax.add_patch(circle)
+    ax.plot([x, x], [y + 13, y - 20], color=color, lw=2.2, zorder=5)
+    ax.plot([x - 20, x + 20], [y, y], color=color, lw=2.2, zorder=5)
+    ax.plot([x, x - 18], [y - 20, y - 50], color=color, lw=2.2, zorder=5)
+    ax.plot([x, x + 18], [y - 20, y - 50], color=color, lw=2.2, zorder=5)
+    ax.text(x, y - 70, name, ha='center', va='top', fontsize=9.5, weight='bold', color='#0F172A', zorder=5)
+
+def draw_ellipse_uc(ax, cx, cy, text, rx=110, ry=26, color='#1D4ED8', bg='#EFF6FF'):
+    ellipse = patches.Ellipse((cx, cy), rx*2, ry*2, edgecolor=color, facecolor=bg, lw=1.5, zorder=4)
+    ax.add_patch(ellipse)
+    ax.text(cx, cy, text, ha='center', va='center', fontsize=8.8, color='#0F172A', zorder=5, multialignment='center')
+
+def draw_uc_boundary(ax, x, y, w, h, title):
+    rect = patches.Rectangle((x, y), w, h, edgecolor='#94A3B8', facecolor='#F8FAFC', lw=1.6, linestyle='--', zorder=1)
+    ax.add_patch(rect)
+    ax.text(x + w/2, y + h - 22, title, ha='center', va='center', fontsize=11.5, weight='bold', color='#1E293B', zorder=2)
+
+def connect_uc(ax, p1, p2, color='#64748B', lw=1.3):
+    ax.plot([p1[0], p2[0]], [p1[1], p2[1]], color=color, lw=lw, zorder=3)
+
+def arrow_uc(ax, p1, p2, label="", color='#2563EB'):
+    ax.annotate("", xy=p2, xytext=p1,
+                arrowprops=dict(arrowstyle="->", color=color, lw=1.3, linestyle="--"), zorder=4)
+    if label:
+        mx, my = (p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2 + 8
+        ax.text(mx, my, label, ha='center', va='center', fontsize=8, color=color, style='italic',
+                bbox=dict(boxstyle='round,pad=0.2', facecolor='#FFFFFF', edgecolor='none', alpha=0.9), zorder=5)
+
+def gen_m5_detailed_uc_diagram():
+    fig, ax = plt.subplots(figsize=(12, 8.5), dpi=220)
+    ax.set_xlim(0, 1100)
+    ax.set_ylim(0, 750)
+    ax.axis('off')
+
+    draw_uc_boundary(ax, 210, 30, 680, 690, "CHỨC NĂNG: XEM THỐNG KÊ DOANH THU SỰ KIỆN")
+
+    # Actors
+    draw_uc_actor(ax, 100, 380, "Ban tổ chức\n(Organizer)")
+    draw_uc_actor(ax, 990, 380, "Quản trị viên\n(Admin)")
+
+    # Central Use Case
+    draw_ellipse_uc(ax, 550, 380, "Xem thống kê\ndoanh thu sự kiện", rx=130, ry=34, color='#1E3A8A', bg='#BFDBFE')
+
+    # <<include>> Use Cases
+    draw_ellipse_uc(ax, 550, 610, "Chọn sự kiện cần thống kê", rx=115, ry=26, bg='#FEF3C7', color='#D97706')
+    draw_ellipse_uc(ax, 360, 500, "Tổng hợp & Tính toán KPIs\n(Doanh thu & Tỷ lệ lấp đầy)", rx=125, ry=28, bg='#FEF3C7', color='#D97706')
+
+    # <<extend>> Use Cases
+    draw_ellipse_uc(ax, 740, 500, "Lọc theo suất diễn\n& khoảng ngày", rx=115, ry=26, bg='#F1F5F9', color='#475569')
+    draw_ellipse_uc(ax, 380, 180, "Xem chi tiết phân bổ\ndoanh thu theo phân khu", rx=125, ry=28, bg='#EFF6FF', color='#2563EB')
+    draw_ellipse_uc(ax, 720, 180, "Xuất báo cáo doanh thu\n(Excel / PDF)", rx=120, ry=28, bg='#EFF6FF', color='#2563EB')
+
+    # Connect Actors to Central UC
+    connect_uc(ax, (120, 380), (420, 380))
+    connect_uc(ax, (970, 380), (680, 380))
+
+    # <<include>> arrows (from central UC to included UC)
+    arrow_uc(ax, (550, 414), (550, 584), "<<include>>")
+    arrow_uc(ax, (470, 405), (410, 472), "<<include>>")
+
+    # <<extend>> arrows (from extending UC to central UC)
+    arrow_uc(ax, (690, 474), (630, 405), "<<extend>>")
+    arrow_uc(ax, (430, 208), (510, 346), "<<extend>>")
+    arrow_uc(ax, (670, 208), (590, 346), "<<extend>>")
+
+    plt.tight_layout()
+    path = os.path.join(OUTPUT_DIR, "uc_m5_view_revenue_detail.png")
+    plt.savefig(path, bbox_inches='tight')
+    plt.close()
+    print("Saved:", path)
+
 def draw_assoc(ax, p1, p2, mult1="", mult2="", label="", color='#334155'):
     ax.plot([p1[0], p2[0]], [p1[1], p2[1]], color=color, lw=1.3, zorder=2)
     if mult1:
@@ -350,11 +423,12 @@ def gen_m5_analysis_class_diagram():
     print("Saved:", path)
 
 def main():
-    print("Generating detailed design and analysis diagrams for Module 5 key use case...")
+    print("Generating detailed UC, design, and analysis diagrams for Module 5 key use case...")
+    gen_m5_detailed_uc_diagram()
     gen_m5_analysis_class_diagram()
     gen_m5_detailed_class_diagram()
     gen_m5_sequence_diagram()
-    print("Done generating M5 key use case diagrams!")
+    print("Done generating all M5 key use case diagrams!")
 
 if __name__ == "__main__":
     main()

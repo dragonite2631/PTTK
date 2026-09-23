@@ -257,6 +257,43 @@ flowchart LR
 
 ---
 
+### 2.7. Biểu đồ Use Case chi tiết cho chức năng trọng tâm: Xem thống kê doanh thu sự kiện
+
+```mermaid
+flowchart TB
+    Organizer((Ban tổ chức))
+    Admin((Quản trị viên))
+
+    subgraph Subsystem ["CHỨC NĂNG: XEM THỐNG KÊ DOANH THU SỰ KIỆN"]
+        UC_Main(["Xem thống kê doanh thu sự kiện"])
+        UC_Select(["Chọn sự kiện cần thống kê"])
+        UC_Compute(["Tổng hợp & Tính toán KPIs\n(Doanh thu & Tỷ lệ lấp đầy)"])
+        UC_Filter(["Lọc theo suất diễn & khoảng ngày"])
+        UC_ZoneDetail(["Xem chi tiết phân bổ\ndoanh thu theo phân khu"])
+        UC_Export(["Xuất báo cáo doanh thu\n(Excel / PDF)"])
+    end
+
+    Organizer --> UC_Main
+    Admin --> UC_Main
+
+    UC_Main -.->|<<include>>| UC_Select
+    UC_Main -.->|<<include>>| UC_Compute
+
+    UC_Filter -.->|<<extend>>| UC_Main
+    UC_ZoneDetail -.->|<<extend>>| UC_Main
+    UC_Export -.->|<<extend>>| UC_Main
+```
+
+* **Quan hệ `<<include>>`:**
+  * `Chọn sự kiện cần thống kê`: Là điều kiện tiên quyết bắt buộc để hệ thống xác định đối tượng cần truy vấn và nạp các phân khu vé.
+  * `Tổng hợp & Tính toán KPIs`: Là bước tính toán tự động bắt buộc để sinh ra các chỉ số tài chính (Doanh thu gộp, Doanh thu thuần, Tỷ lệ lấp đầy, Giá vé bình quân) hiển thị lên màn hình.
+* **Quan hệ `<<extend>>`:**
+  * `Lọc theo suất diễn & khoảng ngày`: Điểm mở rộng khi BTC muốn xem thống kê thu hẹp theo từng buổi diễn cụ thể hoặc một giai đoạn mở bán.
+  * `Xem chi tiết phân bổ doanh thu theo phân khu`: Điểm mở rộng khi BTC muốn phân tích sâu tỷ trọng đóng góp của từng hạng vé (VIP, CAT 1, CAT 2, Vé đứng).
+  * `Xuất báo cáo doanh thu (Excel / PDF)`: Điểm mở rộng kích hoạt khi người dùng muốn lưu trữ tệp báo cáo ngoại tuyến về máy.
+
+---
+
 ## 3. BIỂU ĐỒ LỚP THỰC THỂ PHÂN TÍCH CHO HỆ THỐNG VÀ CHO CÁC CHỨC NĂNG
 
 ### Nguyên lý lớp phân tích (Analysis Entity Classes)

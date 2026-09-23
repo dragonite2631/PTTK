@@ -349,6 +349,10 @@ def build_full_docx():
     ]
     add_styled_table(doc, uc5_headers, uc5_data, col_widths=[1.5, 1.2, 2.3, 1.5])
 
+    add_heading_3(doc, "2.6.1. Biểu đồ Use Case chi tiết cho chức năng Xem thống kê doanh thu sự kiện")
+    add_body_p(doc, "Biểu đồ Use Case phân rã chi tiết cho ca sử dụng trọng tâm 'Xem thống kê doanh thu sự kiện' làm rõ các ca sử dụng bắt buộc bao hàm (<<include>>) để thực hiện tính toán tài chính và các ca sử dụng mở rộng (<<extend>>) phục vụ lọc và kết xuất báo cáo:")
+    add_diagram_image(doc, "uc_m5_view_revenue_detail.png", "Hình 2.7: Biểu đồ Use Case chi tiết - Chức năng Xem thống kê doanh thu sự kiện")
+
     # =========================================================================
     # PHẦN 3
     # =========================================================================
