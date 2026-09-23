@@ -250,7 +250,7 @@ def build_full_docx():
         ["2", "Trần Thị B", "B21DCCN002", "Thành viên", "Module 2: Tìm kiếm & Xem sự kiện\n- Trang chủ hiển thị sự kiện nổi bật, thịnh hành\n- Tìm kiếm, lọc sự kiện đa tiêu chí (ngày, địa điểm, thể loại)\n- Chi tiết sự kiện, dàn nghệ sĩ biểu diễn, lưu yêu thích"],
         ["3", "Lê Văn C", "B21DCCN003", "Thành viên", "Module 3: Xếp hàng và chọn chỗ\n- Hàng đợi ảo thông minh (Virtual Queue) khi lưu lượng cao\n- Hiển thị sơ đồ ghế sân khấu thời gian thực (Real-time Seat Map)\n- Chọn vị trí ghế, khóa ghế tạm thời (Hold Timer 10-15 phút)"],
         ["4", "Phạm Thị D", "B21DCCN004", "Thành viên", "Module 4: Tính tiền và Xuất vé\n- Tạo đơn hàng mua vé, áp dụng mã voucher khuyến mãi\n- Tích hợp cổng thanh toán trực tuyến (VNPAY, Ví MoMo, Thẻ ATM/Visa)\n- Tạo vé điện tử mã QR Code động, gửi vé qua Email"],
-        ["5", "Hoàng Văn E", "B21DCCN005", "Thành viên", "Module 5: Quản lý và thống kê dành cho ban tổ chức\n- Công cụ vẽ & thiết kế sơ đồ sân khấu/ghế ngồi\n- Tạo và đăng bài sự kiện, quản lý suất diễn, cấu hình giá vé\n- Quản lý check-in khách hàng, báo cáo thống kê doanh thu"]
+        ["5", "Hoàng Văn E", "B21DCCN005", "Thành viên", "Chức năng 5: Xem thống kê doanh thu sự kiện\n- Tiếp nhận yêu cầu tra cứu từ Ban tổ chức\n- Tính toán các chỉ số KPIs (Gross/Net Revenue, Occupancy Rate)\n- Phân tích tỷ trọng đóng góp doanh thu theo từng phân khu khán đài\n- Kết xuất báo cáo thống kê trực quan (dashboard & file)"]
     ]
     add_styled_table(doc, members_headers, members_data, col_widths=[0.5, 1.3, 1.1, 1.0, 2.6])
 
@@ -333,25 +333,21 @@ def build_full_docx():
     ]
     add_styled_table(doc, uc4_headers, uc4_data, col_widths=[1.5, 1.2, 2.3, 1.5])
 
-    # Module 5
-    add_heading_2(doc, "2.6. Biểu đồ Use Case Phân hệ 5: Quản lý và thống kê dành cho ban tổ chức")
-    add_body_p(doc, "Phân hệ cung cấp bộ công cụ quản trị dành riêng cho Ban tổ chức sự kiện: thiết kế layout khán đài sân khấu, khởi tạo sự kiện mới, định giá vé cho từng khu vực, thiết lập đợt mở bán, quản lý danh sách người tham gia và xem báo cáo tổng kết doanh thu trực quan.")
-    add_diagram_image(doc, "uc_module5.png", "Hình 2.6: Biểu đồ Use Case Phân hệ 5 - Quản lý & Thống kê dành cho BTC")
+    # Module 5 - Focused Single Feature
+    add_heading_2(doc, "2.6. Biểu đồ Use Case Chức năng 5: Xem thống kê doanh thu sự kiện")
+    add_body_p(doc, "Trong bài tập môn học, thành viên 5 phụ trách chuyên sâu chức năng nghiệp vụ đơn lẻ 'Xem thống kê doanh thu sự kiện' (View Event Revenue Statistics). Biểu đồ Use Case phân rã chi tiết dưới đây làm rõ các ca sử dụng bao hàm (<<include>>) bắt buộc để thực hiện tính toán tài chính và các ca sử dụng mở rộng (<<extend>>) phục vụ lọc và kết xuất báo cáo:")
+    add_diagram_image(doc, "uc_m5_view_revenue_detail.png", "Hình 2.6: Biểu đồ Use Case chi tiết - Chức năng Xem thống kê doanh thu sự kiện")
 
     uc5_headers = ["Use Case", "Tác nhân", "Mô tả nghiệp vụ", "Quan hệ Use Case"]
     uc5_data = [
-        ["Thiết kế sơ đồ ghế", "Ban tổ chức", "Công cụ vẽ khán đài trực quan: thiết lập khu vực ghế ngồi, hàng ghế, số ghế, vé đứng tự do.", "Không"],
-        ["Tạo sự kiện mới", "Ban tổ chức, Admin", "Nhập thông tin sự kiện: tiêu đề, poster, thể loại, thông tin nghệ sĩ, địa điểm tổ chức.", "Không"],
-        ["Cấu hình giá vé & Suất diễn", "Ban tổ chức", "Thiết lập các khung giờ diễn và gán bảng giá vé riêng cho từng khu vực ghế (VIP, Regular).", "Không"],
-        ["Quản lý mở bán & Voucher", "Ban tổ chức", "Tạo các đợt mở bán (Early Bird, General Sale) và phát hành mã giảm giá kèm ngân sách.", "Không"],
-        ["Quản lý check-in soát vé", "Ban tổ chức", "Ứng dụng quét mã QR tại cổng ra vào để xác thực vé hợp lệ và ghi nhận thời gian vào cửa.", "Không"],
-        ["Báo cáo thống kê doanh thu", "Ban tổ chức, Admin", "Xem tổng quan doanh thu, số vé đã bán, tỷ lệ lấp đầy khán đài theo thời gian thực.", "<<extend>> Xuất báo cáo (Excel/PDF)"]
+        ["Xem thống kê doanh thu sự kiện", "Ban tổ chức, Admin", "Ca sử dụng trung tâm: tiếp nhận yêu cầu, tổng hợp và hiển thị toàn bộ báo cáo doanh thu sự kiện.", "Chức năng chính"],
+        ["Chọn sự kiện cần thống kê", "Ban tổ chức, Admin", "Chọn sự kiện cụ thể từ danh sách sự kiện do ban tổ chức quản lý để nạp dữ liệu.", "<<include>> Bắt buộc thực hiện trước khi xem"],
+        ["Tính toán chỉ số KPIs", "Hệ thống (RevenueReport)", "Thực hiện chuỗi phương thức tính toán: doanh thu gộp, doanh thu thuần, tỷ lệ lấp đầy, giá vé bình quân.", "<<include>> Bắt buộc để có dữ liệu báo cáo"],
+        ["Lọc theo suất diễn & ngày", "Ban tổ chức", "Tùy chọn lọc thu hẹp phạm vi thống kê theo từng suất diễn cụ thể hoặc một khoảng ngày mở bán.", "<<extend>> Mở rộng theo nhu cầu"],
+        ["Xem phân bổ theo phân khu", "Ban tổ chức", "Xem biểu đồ và bảng phân tích chi tiết tỷ trọng đóng góp doanh thu của từng phân khu (VIP, Regular, Stand).", "<<extend>> Mở rộng phân tích sâu"],
+        ["Xuất báo cáo (Excel / PDF)", "Ban tổ chức, Admin", "Kết xuất toàn bộ dữ liệu thống kê ra tệp bảng tính Excel hoặc tài liệu PDF ngoại tuyến.", "<<extend>> Mở rộng khi cần lưu tệp"]
     ]
-    add_styled_table(doc, uc5_headers, uc5_data, col_widths=[1.5, 1.2, 2.3, 1.5])
-
-    add_heading_3(doc, "2.6.1. Biểu đồ Use Case chi tiết cho chức năng Xem thống kê doanh thu sự kiện")
-    add_body_p(doc, "Biểu đồ Use Case phân rã chi tiết cho ca sử dụng trọng tâm 'Xem thống kê doanh thu sự kiện' làm rõ các ca sử dụng bắt buộc bao hàm (<<include>>) để thực hiện tính toán tài chính và các ca sử dụng mở rộng (<<extend>>) phục vụ lọc và kết xuất báo cáo:")
-    add_diagram_image(doc, "uc_m5_view_revenue_detail.png", "Hình 2.7: Biểu đồ Use Case chi tiết - Chức năng Xem thống kê doanh thu sự kiện")
+    add_styled_table(doc, uc5_headers, uc5_data, col_widths=[1.6, 1.2, 2.3, 1.4])
 
     # =========================================================================
     # PHẦN 3
@@ -408,14 +404,10 @@ def build_full_docx():
     add_body_p(doc, "Order đóng vai trò trung tâm liên kết với Voucher (0..1), PaymentTransaction (1) và chứa tập hợp các Ticket (1..*), mỗi Ticket tương ứng một Seat duy nhất.")
     add_diagram_image(doc, "analysis_module4.png", "Hình 3.5: Biểu đồ lớp thực thể phân tích - Phân hệ 4: Tính tiền và Xuất vé")
 
-    # Module 5 Analysis
-    add_heading_2(doc, "3.6. Biểu đồ lớp thực thể phân tích Phân hệ 5: Quản lý và thống kê BTC")
-    add_body_p(doc, "Organizer quản lý nhiều Event, mỗi sự kiện áp dụng SeatMap và nhiều Showtime, từ đó thiết lập ZonePricing và kết xuất RevenueReport.")
-    add_diagram_image(doc, "analysis_module5.png", "Hình 3.6: Biểu đồ lớp thực thể phân tích - Phân hệ 5: Quản lý & Thống kê BTC")
-
-    add_heading_3(doc, "3.6.1. Biểu đồ lớp phân tích chi tiết cho chức năng Xem thống kê doanh thu sự kiện")
+    # Module 5 Analysis - Focused Single Feature
+    add_heading_2(doc, "3.6. Biểu đồ lớp thực thể phân tích Chức năng 5: Xem thống kê doanh thu sự kiện")
     add_body_p(doc, "Để đáp ứng nguyên tắc hướng đối tượng cốt lõi (Lớp phải đóng gói trạng thái và hành vi tính toán nghiệp vụ, không chỉ là tập hợp dữ liệu thụ động/Anemic Domain Model), biểu đồ lớp phân tích dưới đây thể hiện chi tiết các thực thể tham gia ca sử dụng đơn lẻ 'Xem thống kê doanh thu sự kiện' cùng các phương thức tính toán tài chính trọng tâm:")
-    add_diagram_image(doc, "analysis_m5_view_revenue_detail.png", "Hình 3.7: Biểu đồ lớp phân tích chi tiết - Chức năng Xem thống kê doanh thu sự kiện")
+    add_diagram_image(doc, "analysis_m5_view_revenue_detail.png", "Hình 3.6: Biểu đồ lớp thực thể phân tích - Chức năng Xem thống kê doanh thu sự kiện")
 
     # =========================================================================
     # PHẦN 4
@@ -492,22 +484,9 @@ def build_full_docx():
     ]
     add_styled_table(doc, d4_headers, d4_data, col_widths=[1.5, 2.5, 2.5])
 
-    # Module 5 Design
-    add_heading_2(doc, "4.6. Biểu đồ lớp thực thể thiết kế Phân hệ 5: Quản lý và thống kê BTC")
-    add_body_p(doc, "Mô hình thiết kế chi tiết các lớp Organizer, Event, SeatMap, Showtime, ZonePricing và RevenueReport:")
-    add_diagram_image(doc, "design_module5.png", "Hình 4.6: Biểu đồ lớp thực thể thiết kế - Phân hệ 5: Quản lý & Thống kê BTC")
-
-    d5_headers = ["Lớp thiết kế", "Thuộc tính chi tiết (Kiểu dữ liệu & Ràng buộc)", "Phương thức nghiệp vụ (Operations)"]
-    d5_data = [
-        ["Organizer", "- id: Long [PK]\n- companyName: String\n- taxId: String [Unique]\n- email: String", "+ createEvent(dto: EventDto): Event\n+ updatePricing(pricingDto): void\n+ viewReports(eventId: Long): RevenueReport"],
-        ["ZonePricing", "- id: Long [PK]\n- price: double [>= 0]\n- maxQuota: int [Total Allocated Seats]\n- soldCount: int [Current Sold Seats]", "+ calculateZoneGross(): double\n+ calculateRemainingSeats(): int\n+ getSoldRate(): double\n+ isSoldOut(): boolean\n+ recordSale(quantity: int): void"],
-        ["RevenueReport", "- id: Long [PK]\n- eventId: Long\n- calculatedAt: LocalDateTime\n- taxRate: double\n- platformCommissionRate: double", "+ calculateTotalCapacity(): int\n+ calculateTotalTicketsSold(): int\n+ calculateGrossRevenue(): double\n+ calculateNetRevenue(): double\n+ calculateOccupancyRate(): double\n+ calculateAverageTicketPrice(): double\n+ calculateZoneContribution(zoneId: Long): double\n+ evaluatePerformance(): PerformanceStatus\n+ exportExcel(): byte[]\n+ exportPdf(): byte[]"]
-    ]
-    add_styled_table(doc, d5_headers, d5_data, col_widths=[1.5, 2.5, 2.5])
-
-    # Module 5 Key Use Case Detailed Design
-    add_heading_2(doc, "4.7. Thiết kế chi tiết chức năng trọng tâm Module 5: Xem thống kê doanh thu sự kiện")
-    add_body_p(doc, "Trong Module 5, chức năng 'Xem thống kê doanh thu sự kiện' (View Event Revenue Statistics) là một chức năng nghiệp vụ đơn lẻ (Single Atomic Function - Read/Calculate Analytics) đóng vai trò quyết định hiệu quả kinh doanh của Ban tổ chức. Chức năng này không đơn thuần là truy vấn dữ liệu thô (DTO) mà đòi hỏi các lớp thực thể phải sở hữu các phương thức thực hiện tính toán tài chính phức tạp, đảm bảo tính đóng gói (Encapsulation) chuẩn mực của lập trình hướng đối tượng.", "Lý do lựa chọn chức năng: ")
+    # Module 5 Design - Focused Single Feature
+    add_heading_2(doc, "4.6. Biểu đồ lớp thực thể thiết kế Chức năng 5: Xem thống kê doanh thu sự kiện")
+    add_body_p(doc, "Chức năng 'Xem thống kê doanh thu sự kiện' (View Event Revenue Statistics) là chức năng đơn lẻ (Single Atomic Function - Read/Calculate Analytics) phụ trách toàn bộ việc tính toán và kết xuất báo cáo tài chính cho sự kiện. Dưới đây là thiết kế chi tiết bao gồm đặc tả Use Case, biểu đồ tuần tự tương tác BCE, biểu đồ lớp thiết kế BCE và bảng thuật toán chi tiết cho các phương thức tính toán:")
 
     add_heading_3(doc, "a. Đặc tả ca sử dụng chi tiết (Use Case Specification)")
     uc_spec_headers = ["Thuộc tính đặc tả", "Nội dung chi tiết"]
@@ -524,11 +503,11 @@ def build_full_docx():
 
     add_heading_3(doc, "b. Biểu đồ tuần tự (Sequence Diagram) thể hiện tương tác BCE")
     add_body_p(doc, "Biểu đồ tuần tự thể hiện sự tương tác mạch lạc giữa tác nhân Ban tổ chức, lớp Boundary (Giao diện), lớp Control (Điều phối) và các lớp Entity (Thực thể tính toán):")
-    add_diagram_image(doc, "seq_m5_view_revenue.png", "Hình 4.7: Biểu đồ tuần tự ca sử dụng Xem thống kê doanh thu sự kiện")
+    add_diagram_image(doc, "seq_m5_view_revenue.png", "Hình 4.6: Biểu đồ tuần tự ca sử dụng Xem thống kê doanh thu sự kiện")
 
     add_heading_3(doc, "c. Biểu đồ lớp thiết kế chi tiết theo mô hình BCE")
     add_body_p(doc, "Mô hình thiết kế 3 lớp (Boundary - Control - Entity) làm nổi bật các phương thức tính toán nghiệp vụ trong các lớp thực thể RevenueReport và ZonePricing:")
-    add_diagram_image(doc, "design_m5_view_revenue_detail.png", "Hình 4.8: Biểu đồ lớp thiết kế chi tiết (BCE) chức năng Thống kê doanh thu")
+    add_diagram_image(doc, "design_m5_view_revenue_detail.png", "Hình 4.7: Biểu đồ lớp thiết kế chi tiết (BCE) chức năng Thống kê doanh thu")
 
     add_heading_3(doc, "d. Bảng phân tích chi tiết các phương thức tính toán (Computational Methods)")
     add_body_p(doc, "Để các lớp không bị biến thành 'cấu trúc dữ liệu thụ động' (Anemic Domain Model), toàn bộ logic tính toán tài chính được đóng gói trực tiếp vào các thực thể:")
@@ -556,8 +535,13 @@ def build_full_docx():
     add_bullet_p(doc, "Biểu đồ lớp thực thể phân tích tổng thể và 5 biểu đồ lớp thực thể phân tích phân rã theo 5 module, thể hiện đúng bản chất mô hình hóa khái niệm miền bài toán.", "3. Biểu đồ lớp phân tích: ")
     add_bullet_p(doc, "Biểu đồ lớp thực thể thiết kế tổng thể và 5 biểu đồ lớp thực thể thiết kế chi tiết theo 5 module với cấu trúc 3 ngăn chuẩn UML, kiểu dữ liệu chặt chẽ, ràng buộc khóa chính và phương thức nghiệp vụ.", "4. Biểu đồ lớp thiết kế: ")
 
-    doc.save(DOCX_OUT)
-    print(f"Document successfully generated and saved to: {DOCX_OUT}")
+    try:
+        doc.save(DOCX_OUT)
+        print(f"Document successfully generated and saved to: {DOCX_OUT}")
+    except PermissionError:
+        alt_out = os.path.join(BASE_DIR, "N12 Nhóm 01 - HoanChinh.docx")
+        doc.save(alt_out)
+        print(f"Note: '{DOCX_OUT}' is currently open in Word. Saved successfully to: {alt_out}")
 
 if __name__ == "__main__":
     build_full_docx()

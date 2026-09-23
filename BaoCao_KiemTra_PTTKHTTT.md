@@ -20,7 +20,7 @@
 | **2** | **Trần Thị B** | B21DCCN002 | Thành viên | **Module 2: Tìm kiếm & Xem sự kiện**<br>• Xem danh sách sự kiện nổi bật, thịnh hành (Trending/Hot)<br>• Tìm kiếm và lọc đa tiêu chí (ngày diễn, địa điểm, thể loại, khoảng giá)<br>• Xem trang chi tiết sự kiện, dàn nghệ sĩ/khách mời biểu diễn<br>• Lưu danh sách sự kiện yêu thích (Wishlist) & chia sẻ sự kiện |
 | **3** | **Lê Văn C** | B21DCCN003 | Thành viên | **Module 3: Xếp hàng và chọn chỗ**<br>• Xếp hàng đợi ảo (Virtual Queue) khi lưu lượng truy cập lớn<br>• Hiển thị sơ đồ khán đài và trạng thái từng ghế thời gian thực<br>• Chọn vị trí ghế ngồi (VIP, Standard, Fan Zone, vé đứng)<br>• Khóa giữ ghế tạm thời (10–15 phút có bộ đếm ngược) |
 | **4** | **Phạm Thị D** | B21DCCN004 | Thành viên | **Module 4: Tính tiền và Xuất vé**<br>• Tạo đơn hàng mua vé, áp dụng mã voucher giảm giá<br>• Thanh toán trực tuyến qua cổng VNPAY, Ví MoMo, Thẻ ATM/Visa<br>• Xử lý giao dịch và sinh mã vé điện tử QR Code động chống giả mạo<br>• Gửi vé qua Email và lưu trữ vào danh mục "Vé của tôi" |
-| **5** | **Hoàng Văn E** | B21DCCN005 | Thành viên | **Module 5: Quản lý và thống kê dành cho ban tổ chức**<br>• Công cụ vẽ & tạo sơ đồ các khu vực ghế ngồi cho sân khấu<br>• Đăng bài tạo sự kiện mới, quản lý lịch diễn và cấu hình giá vé<br>• Quản lý đợt mở bán vé (Early Bird, Regular) và mã khuyến mãi<br>• Quản lý danh sách check-in và xem báo cáo tổng kết doanh thu |
+| **5** | **Hoàng Văn E** | B21DCCN005 | Thành viên | **Chức năng 5: Xem thống kê doanh thu sự kiện**<br>• Tiếp nhận yêu cầu tra cứu từ Ban tổ chức<br>• Tính toán các chỉ số KPIs (Gross/Net Revenue, Occupancy Rate)<br>• Phân tích tỷ trọng đóng góp theo từng phân khu khán đài<br>• Kết xuất báo cáo thống kê trực quan (dashboard & file) |
 
 ---
 
@@ -220,44 +220,7 @@ flowchart LR
 
 ---
 
-### 2.6. Biểu đồ Use Case Phân hệ 5: Quản lý và thống kê dành cho ban tổ chức
-
-```mermaid
-flowchart LR
-    Organizer((Ban tổ chức))
-    Admin((Quản trị viên))
-
-    subgraph Mod5 ["Phân hệ 5: Quản lý & Thống kê BTC"]
-        UC_Layout["Thiết kế & Tạo sơ đồ ghế sân khấu"]
-        UC_NewEvent["Đăng bài tạo sự kiện mới"]
-        UC_Pricing["Quản lý suất diễn & Cấu hình giá vé"]
-        UC_Promo["Thiết lập đợt mở bán & Mã khuyến mãi"]
-        UC_Checkin["Quản lý danh sách khách & Soát vé QR"]
-        UC_Report["Xem báo cáo thống kê doanh thu"]
-        UC_Export["Xuất báo cáo (Excel/PDF)"]
-    end
-
-    Organizer --> UC_Layout
-    Organizer --> UC_NewEvent
-    Organizer --> UC_Pricing
-    Organizer --> UC_Promo
-    Organizer --> UC_Checkin
-    Organizer --> UC_Report
-
-    Admin --> UC_NewEvent
-    Admin --> UC_Report
-
-    UC_Export -.->|<<extend>>| UC_Report
-```
-
-**Đặc tả tóm tắt Use Case Phân hệ 5:**
-* **Thiết kế sơ đồ ghế:** Công cụ Canvas trực quan cho phép BTC dựng khán đài, chia khu vực VIP, CAT 1, CAT 2, vẽ hàng ghế, số ghế và định cấu hình vé ngồi hoặc vé đứng.
-* **Tạo sự kiện & Định giá vé:** Nhập mô tả, poster, nghệ sĩ, địa điểm; tạo các suất diễn và gán bảng giá vé cho từng khu vực ghế.
-* **Soát vé & Báo cáo:** Ứng dụng quét mã QR tại cửa vào sự kiện xác thực vé hợp lệ trong 1 giây, ngăn chặn vé giả và vé sử dụng lại. Dashboard hiển thị số vé bán, tỷ lệ lấp đầy sân khấu và tổng doanh thu thu được.
-
----
-
-### 2.7. Biểu đồ Use Case chi tiết cho chức năng trọng tâm: Xem thống kê doanh thu sự kiện
+### 2.6. Biểu đồ Use Case Chức năng 5: Xem thống kê doanh thu sự kiện
 
 ```mermaid
 flowchart TB
@@ -284,13 +247,14 @@ flowchart TB
     UC_Export -.->|<<extend>>| UC_Main
 ```
 
-* **Quan hệ `<<include>>`:**
-  * `Chọn sự kiện cần thống kê`: Là điều kiện tiên quyết bắt buộc để hệ thống xác định đối tượng cần truy vấn và nạp các phân khu vé.
-  * `Tổng hợp & Tính toán KPIs`: Là bước tính toán tự động bắt buộc để sinh ra các chỉ số tài chính (Doanh thu gộp, Doanh thu thuần, Tỷ lệ lấp đầy, Giá vé bình quân) hiển thị lên màn hình.
-* **Quan hệ `<<extend>>`:**
-  * `Lọc theo suất diễn & khoảng ngày`: Điểm mở rộng khi BTC muốn xem thống kê thu hẹp theo từng buổi diễn cụ thể hoặc một giai đoạn mở bán.
-  * `Xem chi tiết phân bổ doanh thu theo phân khu`: Điểm mở rộng khi BTC muốn phân tích sâu tỷ trọng đóng góp của từng hạng vé (VIP, CAT 1, CAT 2, Vé đứng).
-  * `Xuất báo cáo doanh thu (Excel / PDF)`: Điểm mở rộng kích hoạt khi người dùng muốn lưu trữ tệp báo cáo ngoại tuyến về máy.
+* **Ý nghĩa ca sử dụng:** Chức năng 5 tập trung duy nhất vào nghiệp vụ đơn lẻ: **Xem thống kê doanh thu sự kiện** (View Event Revenue Statistics) dành cho Ban tổ chức và Quản trị viên.
+* **Quan hệ `<<include>>` (Bắt buộc):**
+  * `Chọn sự kiện cần thống kê`: Xác định đối tượng sự kiện cần kết xuất báo cáo tài chính.
+  * `Tổng hợp & Tính toán KPIs`: Bước tính toán tự động các chỉ số doanh thu gộp, doanh thu thuần, tỷ lệ lấp đầy và giá vé bình quân.
+* **Quan hệ `<<extend>>` (Tùy chọn mở rộng):**
+  * `Lọc theo suất diễn & khoảng ngày`: Mở rộng khi cần thống kê thu hẹp.
+  * `Xem chi tiết phân bổ doanh thu theo phân khu`: Mở rộng khi cần phân tích sâu tỷ trọng từng hạng vé.
+  * `Xuất báo cáo doanh thu (Excel / PDF)`: Mở rộng khi cần lưu tệp ngoại tuyến về máy.
 
 ---
 
@@ -425,13 +389,13 @@ classDiagram
 * Các thực thể: `Order`, `Ticket`, `Voucher`, `PaymentTransaction`, `Customer`, `Seat`.
 * Quan hệ: `Order` do `Customer` lập, áp dụng 0..1 `Voucher`, thanh toán qua 1 `PaymentTransaction`, và bao hàm 1..* `Ticket`. Mỗi `Ticket` được gán cố định cho 1 `Seat`.
 
-#### Phân hệ 5: Quản lý và thống kê dành cho BTC
-* Các thực thể: `Organizer`, `Event`, `Showtime`, `SeatMap`, `SeatZone`, `ZonePricing`, `RevenueReport`.
-* Quan hệ: Ban tổ chức (`Organizer`) quản lý Sự kiện (`Event`); Sự kiện liên kết Sơ đồ ghế (`SeatMap`) và Suất diễn (`Showtime`); Suất diễn định giá qua `ZonePricing` và kết xuất `RevenueReport`.
+#### Chức năng 5: Xem thống kê doanh thu sự kiện
+* Các thực thể: `Organizer`, `Event`, `Showtime`, `ZonePricing`, `RevenueReport`, `SeatZone`.
+* Quan hệ: Ban tổ chức (`Organizer`) yêu cầu báo cáo doanh thu cho Sự kiện (`Event`); Thực thể `RevenueReport` tổng hợp các phân khu vé (`ZonePricing`) và suất diễn (`Showtime`), trực tiếp đóng gói toàn bộ phương thức tính toán tài chính.
 
 ---
 
-### 3.3. Biểu đồ lớp phân tích chi tiết cho chức năng trọng tâm: Xem thống kê doanh thu sự kiện
+### 3.3. Biểu đồ lớp phân tích Chức năng 5: Xem thống kê doanh thu sự kiện
 
 Để giải quyết triệt để yêu cầu: *"Nếu là class thì cần có các phương thức thực hiện tính toán, nếu không chỉ là nhóm dữ liệu không được coi là class"*, biểu đồ lớp phân tích dưới đây thể hiện toàn diện các phương thức tính toán tài chính của các thực thể tham gia ca sử dụng này:
 
@@ -704,16 +668,9 @@ classDiagram
 
 ---
 
-#### Phân hệ 5: Quản lý và thống kê dành cho ban tổ chức (Classes: Organizer, ZonePricing, RevenueReport)
-| Lớp thiết kế | Thuộc tính chi tiết (Kiểu dữ liệu & Ràng buộc) | Phương thức nghiệp vụ (Operations) |
-|:---|:---|:---|
-| **Organizer** | `- id: Long [PK]`<br>`- companyName: String`<br>`- taxId: String`<br>`- email: String` | `+ createEvent(dto: EventDto): Event`<br>`+ updatePricing(pricingDto): void`<br>`+ viewReports(eventId: Long): RevenueReport` |
-| **ZonePricing** | `- id: Long [PK]`<br>`- price: double [>= 0]`<br>`- maxQuota: int`<br>`- soldCount: int` | `+ calculateZoneGross(): double`<br>`+ calculateRemainingSeats(): int`<br>`+ getSoldRate(): double`<br>`+ isSoldOut(): boolean`<br>`+ recordSale(qty: int): void` |
-| **RevenueReport**| `- id: Long [PK]`<br>`- eventId: Long`<br>`- calculatedAt: LocalDateTime`<br>`- taxRate: double`<br>`- platformCommissionRate: double` | `+ calculateTotalCapacity(): int`<br>`+ calculateTotalTicketsSold(): int`<br>`+ calculateGrossRevenue(): double`<br>`+ calculateNetRevenue(): double`<br>`+ calculateOccupancyRate(): double`<br>`+ calculateAverageTicketPrice(): double`<br>`+ calculateZoneContribution(zoneId: Long): double`<br>`+ evaluatePerformance(): PerformanceStatus`<br>`+ exportExcel(): byte[]`<br>`+ exportPdf(): byte[]` |
-
 ---
 
-### 4.3. Thiết kế chi tiết chức năng trọng tâm Module 5: Xem thống kê doanh thu sự kiện (View Event Revenue Statistics)
+### 4.3. Thiết kế chi tiết Chức năng 5: Xem thống kê doanh thu sự kiện (View Event Revenue Statistics)
 
 * **Lý do lựa chọn:** Đây là chức năng đơn lẻ (Single Atomic Function - Read/Calculate Analytics) cốt lõi của Module 5. Chức năng yêu cầu các lớp thực thể phải đóng gói đầy đủ **các phương thức thực hiện tính toán tài chính nghiệp vụ**, đảm bảo không biến lớp thành cấu trúc dữ liệu thụ động (*Anemic Domain Model*).
 
