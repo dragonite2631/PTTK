@@ -423,7 +423,7 @@ classDiagram
 
     class RevenueReport {
         <<analysis>>
-        reportId
+        id
         eventId
         calculatedAt
         taxRate
@@ -432,6 +432,7 @@ classDiagram
         grossRevenue
         netRevenue
         occupancyRate
+        averageTicketPrice
         +calculateTotalCapacity()
         +calculateTotalTicketsSold()
         +calculateGrossRevenue()
@@ -444,7 +445,7 @@ classDiagram
 
     class ZonePricing {
         <<analysis>>
-        pricingId
+        id
         zoneName
         price
         maxQuota
@@ -452,11 +453,12 @@ classDiagram
         +calculateZoneGross()
         +calculateRemainingSeats()
         +getSoldRate()
+        +isSoldOut()
     }
 
     class Showtime {
         <<analysis>>
-        showtimeId
+        id
         showDate
         startTime
         endTime
@@ -466,7 +468,7 @@ classDiagram
 
     class SeatZone {
         <<analysis>>
-        zoneId
+        id
         zoneName
         colorHex
         seatCount
@@ -479,7 +481,7 @@ classDiagram
     RevenueReport "1" --> "*" ZonePricing : aggregates
     RevenueReport "1" --> "*" Showtime : summarizes
     ZonePricing "*" --> "1" SeatZone : maps to
-    Showtime "*" --> "*" SeatZone : arranges
+    Showtime "1" --> "*" ZonePricing : prices via
 ```
 
 ---
@@ -740,11 +742,16 @@ classDiagram
 
     class RevenueReport {
         <<entity>>
-        -reportId: Long
+        -id: Long
         -eventId: Long
         -calculatedAt: LocalDateTime
         -taxRate: double
-        -platformCommissionRate: double
+        -platformFeeRate: double
+        -totalTicketsSold: int
+        -grossRevenue: double
+        -netRevenue: double
+        -occupancyRate: double
+        -averageTicketPrice: double
         +calculateTotalCapacity() int
         +calculateTotalTicketsSold() int
         +calculateGrossRevenue() double
@@ -773,8 +780,32 @@ classDiagram
         -id: Long
         -showDate: LocalDate
         -startTime: LocalTime
+        -endTime: LocalTime
         +calculateShowtimeRevenue() double
         +getSoldTicketsCount() int
+    }
+
+    class Event {
+        <<entity>>
+        -id: Long
+        -title: String
+        -category: String
+        -status: EventStatus
+        +getTotalCapacity() int
+        +getShowtimes() List
+    }
+
+    class RevenueSummaryDto {
+        <<dto>>
+        -grossRevenue: double
+        -netRevenue: double
+        -occupancyRate: double
+        -averagePrice: double
+        -status: PerformanceStatus
+        -zoneBreakdowns: List
+        +getGrossRevenue() double
+        +getNetRevenue() double
+        +getOccupancyRate() double
     }
 
     class PerformanceStatus {
@@ -787,8 +818,11 @@ classDiagram
 
     RevenueReportView ..> RevenueReportController : triggers
     RevenueReportController ..> RevenueReport : invokes
+    RevenueReportController ..> RevenueSummaryDto : creates DTO
+    RevenueSummaryDto <.. RevenueReportView : displays
     RevenueReport "1" --> "*" ZonePricing : aggregates
     RevenueReport "1" --> "*" Showtime : summarizes
+    Event "1" --> "*" Showtime : has
     RevenueReport ..> PerformanceStatus : evaluates to
 ```
 

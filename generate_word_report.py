@@ -406,8 +406,25 @@ def build_full_docx():
 
     # Module 5 Analysis - Focused Single Feature
     add_heading_2(doc, "3.6. Biểu đồ lớp thực thể phân tích Chức năng 5: Xem thống kê doanh thu sự kiện")
-    add_body_p(doc, "Để đáp ứng nguyên tắc hướng đối tượng cốt lõi (Lớp phải đóng gói trạng thái và hành vi tính toán nghiệp vụ, không chỉ là tập hợp dữ liệu thụ động/Anemic Domain Model), biểu đồ lớp phân tích dưới đây thể hiện chi tiết các thực thể tham gia ca sử dụng đơn lẻ 'Xem thống kê doanh thu sự kiện' cùng các phương thức tính toán tài chính trọng tâm:")
+    add_body_p(doc, "Để đáp ứng nguyên tắc hướng đối tượng cốt lõi (Lớp phải đóng gói trạng thái và hành vi tính toán nghiệp vụ, không chỉ là tập hợp dữ liệu thụ động/Anemic Domain Model), biểu đồ lớp phân tích dưới đây thể hiện chi tiết các thực thể tham gia ca sử dụng đơn lẻ 'Xem thống kê doanh thu sự kiện' cùng các phương thức tính toán tài chính trọng tâm. Toàn bộ tên lớp, thuộc tính và phương thức được chuẩn hóa đồng nhất 100% với pha thiết kế:")
     add_diagram_image(doc, "analysis_m5_view_revenue_detail.png", "Hình 3.6: Biểu đồ lớp thực thể phân tích - Chức năng Xem thống kê doanh thu sự kiện")
+
+    ana_m5_headers = ["Lớp phân tích", "Các thuộc tính phân tích cốt lõi", "Các phương thức thực hiện tính toán (Operations)"]
+    ana_m5_data = [
+        ["RevenueReport", "id, eventId, calculatedAt, taxRate, platformFeeRate, totalTicketsSold, grossRevenue, netRevenue, occupancyRate, averageTicketPrice", 
+         "+ calculateTotalCapacity()\n+ calculateTotalTicketsSold()\n+ calculateGrossRevenue()\n+ calculateNetRevenue()\n+ calculateOccupancyRate()\n+ calculateAverageTicketPrice()\n+ calculateZoneContribution(zoneId)\n+ evaluatePerformance()"],
+        ["ZonePricing", "id, zoneName, price, maxQuota, soldCount", 
+         "+ calculateZoneGross()\n+ calculateRemainingSeats()\n+ getSoldRate()\n+ isSoldOut()"],
+        ["Showtime", "id, showDate, startTime, endTime", 
+         "+ calculateShowtimeRevenue()\n+ getSoldTicketsCount()"],
+        ["Event", "id, title, category, status", 
+         "+ getTotalCapacity()\n+ getShowtimes()"],
+        ["SeatZone", "id, zoneName, colorHex, seatCount", 
+         "+ countTotalSeats()"],
+        ["Organizer", "id, companyName, taxId, email", 
+         "+ viewReports(eventId)"]
+    ]
+    add_styled_table(doc, ana_m5_headers, ana_m5_data, col_widths=[1.5, 2.5, 2.5])
 
     # =========================================================================
     # PHẦN 4
@@ -505,9 +522,35 @@ def build_full_docx():
     add_body_p(doc, "Biểu đồ tuần tự thể hiện sự tương tác mạch lạc giữa tác nhân Ban tổ chức, lớp Boundary (Giao diện), lớp Control (Điều phối) và các lớp Entity (Thực thể tính toán):")
     add_diagram_image(doc, "seq_m5_view_revenue.png", "Hình 4.6: Biểu đồ tuần tự ca sử dụng Xem thống kê doanh thu sự kiện")
 
-    add_heading_3(doc, "c. Biểu đồ lớp thiết kế chi tiết theo mô hình BCE")
-    add_body_p(doc, "Mô hình thiết kế 3 lớp (Boundary - Control - Entity) làm nổi bật các phương thức tính toán nghiệp vụ trong các lớp thực thể RevenueReport và ZonePricing:")
-    add_diagram_image(doc, "design_m5_view_revenue_detail.png", "Hình 4.7: Biểu đồ lớp thiết kế chi tiết (BCE) chức năng Thống kê doanh thu")
+    add_heading_3(doc, "c. Biểu đồ lớp thiết kế chi tiết theo mô hình BCE & DTO")
+    add_body_p(doc, "Mô hình thiết kế 3 lớp (Boundary - Control - Entity) kết hợp tầng DTO làm nổi bật các phương thức tính toán nghiệp vụ trong các lớp thực thể RevenueReport và ZonePricing. Toàn bộ tên biến, kiểu dữ liệu chuẩn và phương thức tương ứng đồng nhất 100% với pha phân tích:")
+    add_diagram_image(doc, "design_m5_view_revenue_detail.png", "Hình 4.7: Biểu đồ lớp thiết kế chi tiết (BCE & DTO) chức năng Thống kê doanh thu")
+
+    d5_detail_headers = ["Lớp thiết kế", "Thuộc tính chi tiết (Kiểu dữ liệu & Ràng buộc)", "Phương thức nghiệp vụ & Tính toán"]
+    d5_detail_data = [
+        ["RevenueReport\n(<<entity>>)", 
+         "- id: Long [PK]\n- eventId: Long [FK]\n- calculatedAt: LocalDateTime\n- taxRate: double\n- platformFeeRate: double\n- totalTicketsSold: int\n- grossRevenue: double\n- netRevenue: double\n- occupancyRate: double\n- averageTicketPrice: double",
+         "+ calculateTotalCapacity(): int\n+ calculateTotalTicketsSold(): int\n+ calculateGrossRevenue(): double\n+ calculateNetRevenue(): double\n+ calculateOccupancyRate(): double\n+ calculateAverageTicketPrice(): double\n+ calculateZoneContribution(zoneId: Long): double\n+ evaluatePerformance(): PerformanceStatus\n+ exportExcel(): byte[]\n+ exportPdf(): byte[]"],
+        ["ZonePricing\n(<<entity>>)", 
+         "- id: Long [PK]\n- zoneName: String\n- price: double [>= 0]\n- maxQuota: int\n- soldCount: int",
+         "+ calculateZoneGross(): double\n+ calculateRemainingSeats(): int\n+ getSoldRate(): double\n+ isSoldOut(): boolean\n+ recordSale(quantity: int): void"],
+        ["Showtime\n(<<entity>>)", 
+         "- id: Long [PK]\n- showDate: LocalDate\n- startTime: LocalTime\n- endTime: LocalTime",
+         "+ calculateShowtimeRevenue(): double\n+ getSoldTicketsCount(): int\n+ isPublished(): boolean"],
+        ["Event\n(<<entity>>)", 
+         "- id: Long [PK]\n- title: String\n- category: String\n- status: EventStatus",
+         "+ getTotalCapacity(): int\n+ getShowtimes(): List<Showtime>"],
+        ["RevenueSummaryDto\n(<<dto>>)", 
+         "- grossRevenue: double\n- netRevenue: double\n- occupancyRate: double\n- averagePrice: double\n- status: PerformanceStatus\n- zoneBreakdowns: List<ZoneRevenueDto>",
+         "+ getGrossRevenue(): double\n+ getNetRevenue(): double\n+ getOccupancyRate(): double"],
+        ["RevenueReportController\n(<<control>>)", 
+         "- reportService: ReportService\n- eventRepo: EventRepository",
+         "+ handleViewReport(eventId: Long): RevenueSummaryDto\n+ calculateZoneAnalytics(eventId: Long): List<ZoneRevenueDto>\n+ formatReportData(report: RevenueReport): RevenueSummaryDto"],
+        ["RevenueReportView\n(<<boundary>>)", 
+         "- eventSelector: ComboBox\n- kpiPanel: Panel\n- zoneChart: ChartView",
+         "+ onSelectEvent(eventId: Long): void\n+ displayKPIs(dto: RevenueSummaryDto): void\n+ renderZoneChart(data: List<ZoneRevenueDto>): void\n+ showError(msg: String): void"]
+    ]
+    add_styled_table(doc, d5_detail_headers, d5_detail_data, col_widths=[1.5, 2.5, 2.5])
 
     add_heading_3(doc, "d. Bảng phân tích chi tiết các phương thức tính toán (Computational Methods)")
     add_body_p(doc, "Để các lớp không bị biến thành 'cấu trúc dữ liệu thụ động' (Anemic Domain Model), toàn bộ logic tính toán tài chính được đóng gói trực tiếp vào các thực thể:")
