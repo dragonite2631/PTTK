@@ -8,7 +8,7 @@ from docx.oxml.ns import nsdecls, qn
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DIAGRAMS_DIR = os.path.join(BASE_DIR, "diagrams")
-DOCX_OUT = os.path.join(BASE_DIR, "N12 Nhóm 01 - HoanChinh.docx")
+DOCX_OUT = os.path.join(BASE_DIR, "N12 Nhóm 01.docx")
 
 def set_cell_background(cell, hex_color):
     tcPr = cell._tc.get_or_add_tcPr()
@@ -360,50 +360,53 @@ def build_full_docx():
     add_bullet_p(doc, "Tập trung thể hiện mối quan hệ ngữ nghĩa: Kế thừa (Generalization), Kết hợp (Association), Kết tập/Bao hàm (Composition/Aggregation) kèm bản số (Multiplicity: 1, 1..*, 0..1, *).", "Mối quan hệ: ")
 
     add_heading_2(doc, "3.1. Biểu đồ lớp thực thể phân tích tổng thể hệ thống")
-    add_body_p(doc, "Biểu đồ bao quát toàn bộ 13 thực thể phân tích nòng cốt của hệ thống và các mối liên kết nghiệp vụ giữa chúng:")
+    add_body_p(doc, "Biểu đồ bao quát toàn bộ các thực thể phân tích nòng cốt của hệ thống (được đồng bộ chuẩn hóa tên tiếng Anh theo mô hình thiết kế) và các mối liên kết nghiệp vụ giữa chúng:")
     add_diagram_image(doc, "analysis_tong_the.png", "Hình 3.1: Biểu đồ lớp thực thể phân tích tổng thể toàn hệ thống")
 
-    ana_headers = ["Tên lớp thực thể", "Ý nghĩa nghiệp vụ", "Các thuộc tính phân tích cốt lõi"]
+    ana_headers = ["Tên lớp thực thể (Class)", "Ý nghĩa nghiệp vụ", "Các thuộc tính phân tích (Attributes)"]
     ana_data = [
-        ["NguoiDung", "Thông tin tài khoản chung trong hệ thống", "maNguoiDung, hoTen, email, soDienThoai, matKhau, vaiTro"],
-        ["KhachHang", "Kế thừa NguoiDung, đại diện người mua vé", "diemTichLuy, hangThanhVien"],
-        ["BanToChuc", "Kế thừa NguoiDung, đơn vị tổ chức sự kiện", "tenToChuc, maSoThue, giayPhep, thongTinMoTa"],
-        ["DiaDiem", "Nơi diễn ra sự kiện (sân vận động, nhà hát)", "maDiaDiem, tenDiaDiem, diaChiChiTiet, sucChuaToiDa"],
-        ["SoDoGhe", "Bản thiết kế phân bổ chỗ ngồi của địa điểm", "maSoDo, tenSoDo, kieuSanKhau, tongSoGhe"],
-        ["KhuVucGhe", "Khu vực khán đài cụ thể (VIP, VVIP, CAT 1)", "maKhuVuc, tenKhuVuc, mauSac, loaiKhuVuc, soLuongGhe"],
-        ["Ghe", "Vị trí ghế cụ thể trên khán đài", "maGhe, hangGhe, soThuTu, toaDoX, toaDoY"],
-        ["SuKien", "Sự kiện được tổ chức (Concert, liveshow, kịch)", "maSuKien, tenSuKien, theLoai, moTa, hinhAnh, trangThai"],
-        ["SuatDien", "Một buổi biểu diễn cụ thể của sự kiện", "maSuatDien, ngayDien, thoiGianBatDau, thoiGianKetThuc"],
-        ["GiaVeKhuVuc", "Định giá vé cho từng khu vực của suất diễn", "maGiaVe, donGia, soLuongToiDa"],
-        ["HangDoiAo", "Bản ghi xếp hàng chờ của khách hàng", "maHangDoi, soThuTu, thoiGianVao, trangThaiCho"],
-        ["GiuGheTamThoi", "Trạng thái khóa giữ ghế trong 10-15 phút", "maGiuGhe, thoiGianBatDau, thoiGianHetHan, trangThai"],
-        ["HoaDon", "Đơn hàng thanh toán vé của khách hàng", "maHoaDon, ngayTao, tongTien, soTienGiam, trangThai"]
+        ["User", "Thông tin tài khoản chung trong hệ thống", "userId, username, password, fullName, email, phoneNumber, role"],
+        ["Customer", "Kế thừa User, đại diện người mua vé", "rewardPoints, memberTier"],
+        ["Organizer", "Kế thừa User, đơn vị tổ chức sự kiện", "companyName, taxId, businessLicense, contactInfo"],
+        ["Venue", "Nơi diễn ra sự kiện (sân vận động, nhà hát)", "venueId, venueName, address, capacity"],
+        ["SeatMap", "Bản thiết kế phân bổ chỗ ngồi của địa điểm", "seatMapId, mapName, stageType, totalSeats"],
+        ["SeatZone", "Khu vực khán đài cụ thể (VIP, VVIP, CAT 1)", "zoneId, zoneName, colorHex, zoneType, seatCount"],
+        ["Seat", "Vị trí ghế cụ thể trên khán đài", "seatId, rowLabel, seatNumber, coordinateX, coordinateY"],
+        ["Event", "Sự kiện được tổ chức (Concert, liveshow, kịch)", "eventId, title, category, description, bannerUrl, status"],
+        ["Showtime", "Một buổi biểu diễn cụ thể của sự kiện", "showtimeId, showDate, startTime, endTime"],
+        ["ZonePricing", "Định giá vé cho từng khu vực của suất diễn", "pricingId, price, maxQuota, soldCount"],
+        ["VirtualQueue", "Bản ghi xếp hàng chờ của khách hàng", "queueId, queueNumber, accessToken, status"],
+        ["SeatHold", "Trạng thái khóa giữ ghế trong 10-15 phút", "holdId, holdToken, startTime, expiresAt"],
+        ["Order", "Đơn hàng thanh toán vé của khách hàng", "orderId, orderCode, subTotal, discount, finalTotal, status"],
+        ["Ticket", "Vé điện tử cấp phát cho từng chỗ ngồi", "ticketId, ticketCode, qrCodeHash, price, isUsed"],
+        ["Voucher", "Mã giảm giá khuyến mãi áp dụng cho đơn hàng", "voucherId, code, percentOff, maxDiscount, validUntil"],
+        ["PaymentTransaction", "Giao dịch thanh toán trực tuyến qua cổng", "transactionId, transRef, paymentMethod, transAmount, status"]
     ]
     add_styled_table(doc, ana_headers, ana_data, col_widths=[1.5, 2.3, 2.7])
 
     # Module 1 Analysis
     add_heading_2(doc, "3.2. Biểu đồ lớp thực thể phân tích Phân hệ 1: Quản lý tài khoản")
-    add_body_p(doc, "Thể hiện quan hệ kế thừa giữa NguoiDung với KhachHang và BanToChuc, đồng thời liên kết với PhienDangNhap (phiên làm việc) và ThongBao (thông điệp gửi tới người dùng).")
+    add_body_p(doc, "Thể hiện quan hệ kế thừa giữa User với Customer và Organizer, đồng thời liên kết với UserSession (phiên làm việc) và Notification (thông báo gửi tới người dùng).")
     add_diagram_image(doc, "analysis_module1.png", "Hình 3.2: Biểu đồ lớp thực thể phân tích - Phân hệ 1: Quản lý tài khoản")
 
     # Module 2 Analysis
     add_heading_2(doc, "3.3. Biểu đồ lớp thực thể phân tích Phân hệ 2: Tìm kiếm & Xem sự kiện")
-    add_body_p(doc, "Mô hình hóa thực thể SuKien liên kết với TheLoai, DiaDiem tổ chức, dàn NgheSi biểu diễn và danh sách SuKienYeuThich của khách hàng.")
+    add_body_p(doc, "Mô hình hóa thực thể Event liên kết với Category, Venue tổ chức, dàn Artist biểu diễn và danh sách FavoriteEvent của khách hàng.")
     add_diagram_image(doc, "analysis_module2.png", "Hình 3.3: Biểu đồ lớp thực thể phân tích - Phân hệ 2: Tìm kiếm & Xem sự kiện")
 
     # Module 3 Analysis
     add_heading_2(doc, "3.4. Biểu đồ lớp thực thể phân tích Phân hệ 3: Xếp hàng và chọn chỗ")
-    add_body_p(doc, "Mô hình hóa cấu trúc phân cấp không gian từ SoDoGhe -> KhuVucGhe -> Ghe, kết hợp với HangDoiAo và thực thể GiuGheTamThoi khóa giữ các ghế được chọn.")
+    add_body_p(doc, "Mô hình hóa cấu trúc phân cấp không gian từ SeatMap -> SeatZone -> Seat, kết hợp với VirtualQueue và thực thể SeatHold khóa giữ các ghế được chọn.")
     add_diagram_image(doc, "analysis_module3.png", "Hình 3.4: Biểu đồ lớp thực thể phân tích - Phân hệ 3: Xếp hàng và chọn chỗ")
 
     # Module 4 Analysis
     add_heading_2(doc, "3.5. Biểu đồ lớp thực thể phân tích Phân hệ 4: Tính tiền và Xuất vé")
-    add_body_p(doc, "HoaDon đóng vai trò trung tâm liên kết với MaGiamGia (0..1), GiaoDichThanhToan (1) và chứa tập hợp các Ve (1..*), mỗi Ve tương ứng một Ghe duy nhất.")
+    add_body_p(doc, "Order đóng vai trò trung tâm liên kết với Voucher (0..1), PaymentTransaction (1) và chứa tập hợp các Ticket (1..*), mỗi Ticket tương ứng một Seat duy nhất.")
     add_diagram_image(doc, "analysis_module4.png", "Hình 3.5: Biểu đồ lớp thực thể phân tích - Phân hệ 4: Tính tiền và Xuất vé")
 
     # Module 5 Analysis
     add_heading_2(doc, "3.6. Biểu đồ lớp thực thể phân tích Phân hệ 5: Quản lý và thống kê BTC")
-    add_body_p(doc, "BanToChuc quản lý nhiều SuKien, mỗi sự kiện áp dụng SoDoGhe và nhiều SuatDien, từ đó thiết lập GiaVeKhuVuc và kết xuất BaoCaoDoanhThu.")
+    add_body_p(doc, "Organizer quản lý nhiều Event, mỗi sự kiện áp dụng SeatMap và nhiều Showtime, từ đó thiết lập ZonePricing và kết xuất RevenueReport.")
     add_diagram_image(doc, "analysis_module5.png", "Hình 3.6: Biểu đồ lớp thực thể phân tích - Phân hệ 5: Quản lý & Thống kê BTC")
 
     # =========================================================================

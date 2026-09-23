@@ -459,7 +459,7 @@ def gen_uc_module5():
 
 
 # ====================================================================
-# 2. BIỂU ĐỒ LỚP THỰC THỂ PHÂN TÍCH
+# 2. BIỂU ĐỒ LỚP THỰC THỂ PHÂN TÍCH (ANALYSIS CLASS DIAGRAMS)
 # ====================================================================
 
 def gen_analysis_tong_the():
@@ -471,23 +471,23 @@ def gen_analysis_tong_the():
     plt.title("BIỂU ĐỒ LỚP THỰC THỂ PHÂN TÍCH TỔNG THỂ HỆ THỐNG", fontsize=13, weight='bold', color='#1E3A8A', pad=18)
 
     # Column 1: Left (x=50)
-    b_nd = UMLBox("NguoiDung", ["maNguoiDung", "hoTen", "email", "soDienThoai", "matKhau", "vaiTro"], w=230).place(50, 830)
-    b_kh = UMLBox("KhachHang", ["diemTichLuy"], w=110).place(50, 620)
-    b_btc = UMLBox("BanToChuc", ["tenToChuc", "maSoThue", "giayPhep"], w=110).place(170, 620)
-    b_hd_ao = UMLBox("HangDoiAo", ["maHangDoi", "soThuTu", "thoiGianVao", "trangThaiCho"], w=230).place(50, 480)
-    b_giu_ghe = UMLBox("GiuGheTamThoi", ["maGiuGhe", "thoiGianBatDau", "thoiGianHetHan", "trangThai"], w=230).place(50, 280)
+    b_nd = UMLBox("User", ["userId", "username", "password", "fullName", "email", "phoneNumber", "role"], w=230).place(50, 830)
+    b_kh = UMLBox("Customer", ["rewardPoints", "memberTier"], w=110).place(50, 620)
+    b_btc = UMLBox("Organizer", ["companyName", "taxId", "businessLicense"], w=110).place(170, 620)
+    b_hd_ao = UMLBox("VirtualQueue", ["queueId", "queueNumber", "accessToken", "status"], w=230).place(50, 480)
+    b_giu_ghe = UMLBox("SeatHold", ["holdId", "holdToken", "startTime", "expiresAt"], w=230).place(50, 280)
 
     # Column 2: Center (x=460)
-    b_dd = UMLBox("DiaDiem", ["maDiaDiem", "tenDiaDiem", "diaChiChiTiet", "sucChuaToiDa"], w=230).place(460, 830)
-    b_sd = UMLBox("SoDoGhe", ["maSoDo", "tenSoDo", "kieuSanKhau", "tongSoGhe"], w=230).place(460, 640)
-    b_kv = UMLBox("KhuVucGhe", ["maKhuVuc", "tenKhuVuc", "mauSac", "loaiKhuVuc", "soLuongGhe"], w=230).place(460, 460)
-    b_ghe = UMLBox("Ghe", ["maGhe", "hangGhe", "soThuTu", "toaDoX", "toaDoY"], w=230).place(460, 260)
+    b_dd = UMLBox("Venue", ["venueId", "venueName", "address", "capacity"], w=230).place(460, 830)
+    b_sd = UMLBox("SeatMap", ["seatMapId", "mapName", "stageType", "totalSeats"], w=230).place(460, 640)
+    b_kv = UMLBox("SeatZone", ["zoneId", "zoneName", "colorHex", "zoneType", "seatCount"], w=230).place(460, 460)
+    b_ghe = UMLBox("Seat", ["seatId", "rowLabel", "seatNumber", "coordinateX", "coordinateY"], w=230).place(460, 260)
 
     # Column 3: Right (x=870)
-    b_sk = UMLBox("SuKien", ["maSuKien", "tenSuKien", "theLoai", "moTa", "hinhAnh", "trangThai"], w=240).place(870, 830)
-    b_sdien = UMLBox("SuatDien", ["maSuatDien", "ngayDien", "thoiGianBatDau", "thoiGianKetThuc"], w=240).place(870, 610)
-    b_giave = UMLBox("GiaVeKhuVuc", ["maGiaVe", "donGia", "soLuongToiDa"], w=240).place(870, 420)
-    b_hd = UMLBox("HoaDon", ["maHoaDon", "ngayTao", "tongTien", "soTienGiam", "trangThai"], w=240).place(870, 260)
+    b_sk = UMLBox("Event", ["eventId", "title", "category", "description", "bannerUrl", "status"], w=240).place(870, 830)
+    b_sdien = UMLBox("Showtime", ["showtimeId", "showDate", "startTime", "endTime"], w=240).place(870, 610)
+    b_giave = UMLBox("ZonePricing", ["pricingId", "price", "maxQuota", "soldCount"], w=240).place(870, 420)
+    b_hd = UMLBox("Order", ["orderId", "orderCode", "subTotal", "discount", "finalTotal", "status"], w=240).place(870, 260)
 
     boxes = [b_nd, b_kh, b_btc, b_hd_ao, b_giu_ghe, b_dd, b_sd, b_kv, b_ghe, b_sk, b_sdien, b_giave, b_hd]
     for b in boxes:
@@ -497,8 +497,8 @@ def gen_analysis_tong_the():
     draw_inheritance(ax, b_kh.pt('top'), b_nd.pt('bottom', -50))
     draw_inheritance(ax, b_btc.pt('top'), b_nd.pt('bottom', 50))
 
-    draw_assoc(ax, b_dd.right, b_sk.left, mult1="1", mult2="*", label="tổ chức tại")
-    draw_assoc(ax, b_dd.bottom, b_sd.top, mult1="1", mult2="*", label="chứa")
+    draw_assoc(ax, b_dd.right, b_sk.left, mult1="1", mult2="*", label="hosts at")
+    draw_assoc(ax, b_dd.bottom, b_sd.top, mult1="1", mult2="*", label="has")
     draw_composition(ax, b_sd.bottom, b_kv.top, mult1="1", mult2="*")
     draw_composition(ax, b_kv.bottom, b_ghe.top, mult1="1", mult2="*")
 
@@ -508,10 +508,10 @@ def gen_analysis_tong_the():
 
     draw_assoc(ax, b_kh.pt('bottom', -20), b_hd_ao.top, mult1="1", mult2="*")
     draw_assoc(ax, b_hd_ao.bottom, b_giu_ghe.top, mult1="1", mult2="*")
-    draw_assoc(ax, b_giu_ghe.right, b_ghe.left, mult1="*", mult2="1..*", label="khóa tạm")
+    draw_assoc(ax, b_giu_ghe.right, b_ghe.left, mult1="*", mult2="1..*", label="locks")
 
-    draw_polyline_assoc(ax, [b_btc.right, (350, 560), (350, 750), b_sk.left], mult1="1", mult2="*", label="quản lý")
-    draw_polyline_assoc(ax, [b_kh.pt('bottom', 20), (140, 60), (990, 60), b_hd.bottom], mult1="1", mult2="*", label="thanh toán")
+    draw_polyline_assoc(ax, [b_btc.right, (350, 560), (350, 750), b_sk.left], mult1="1", mult2="*", label="creates")
+    draw_polyline_assoc(ax, [b_kh.pt('bottom', 20), (140, 60), (990, 60), b_hd.bottom], mult1="1", mult2="*", label="pays for")
 
     plt.tight_layout()
     path = os.path.join(OUTPUT_DIR, "analysis_tong_the.png")
@@ -527,11 +527,11 @@ def gen_analysis_module1():
 
     plt.title("BIỂU ĐỒ LỚP THỰC THỂ PHÂN TÍCH - PHÂN HỆ 1: QUẢN LÝ TÀI KHOẢN", fontsize=12, weight='bold', color='#1E3A8A', pad=15)
 
-    b_nd = UMLBox("NguoiDung", ["maNguoiDung", "tenDangNhap", "matKhau", "hoTen", "email", "soDienThoai", "diaChi", "vaiTro", "ngayTao"], w=300).place(350, 660)
-    b_kh = UMLBox("KhachHang", ["diemTichLuy", "hangThanhVien"], w=220).place(70, 390)
-    b_btc = UMLBox("BanToChuc", ["tenToChuc", "maSoThue", "giayPhep", "thongTinMoTa"], w=220).place(650, 390)
-    b_phien = UMLBox("PhienDangNhap", ["maPhien", "tokenXacThuc", "thoiGianBatDau", "thoiGianHetHan"], w=220).place(70, 190)
-    b_tb = UMLBox("ThongBao", ["maThongBao", "tieuDe", "noiDung", "thoiGianGui", "daDoc"], w=220).place(650, 190)
+    b_nd = UMLBox("User", ["userId", "username", "password", "fullName", "email", "phoneNumber", "address", "role", "createdAt"], w=300).place(350, 660)
+    b_kh = UMLBox("Customer", ["rewardPoints", "memberTier"], w=220).place(70, 390)
+    b_btc = UMLBox("Organizer", ["companyName", "taxId", "businessLicense", "contactInfo"], w=220).place(650, 390)
+    b_phien = UMLBox("UserSession", ["sessionId", "jwtToken", "createdAt", "expiresAt"], w=220).place(70, 190)
+    b_tb = UMLBox("Notification", ["notificationId", "title", "message", "sentAt", "isRead"], w=220).place(650, 190)
 
     for b in [b_nd, b_kh, b_btc, b_phien, b_tb]:
         b.draw(ax)
@@ -539,8 +539,8 @@ def gen_analysis_module1():
     draw_inheritance(ax, b_kh.top, b_nd.pt('bottom', -60))
     draw_inheritance(ax, b_btc.top, b_nd.pt('bottom', 60))
 
-    draw_assoc(ax, b_kh.bottom, b_phien.top, mult1="1", mult2="*", label="sở hữu")
-    draw_polyline_assoc(ax, [b_nd.right, (910, b_nd.y - b_nd.h/2), (910, b_tb.y - b_tb.h/2), b_tb.right], mult1="1", mult2="*", label="nhận")
+    draw_assoc(ax, b_kh.bottom, b_phien.top, mult1="1", mult2="*", label="has")
+    draw_polyline_assoc(ax, [b_nd.right, (910, b_nd.y - b_nd.h/2), (910, b_tb.y - b_tb.h/2), b_tb.right], mult1="1", mult2="*", label="receives")
 
     plt.tight_layout()
     path = os.path.join(OUTPUT_DIR, "analysis_module1.png")
@@ -556,22 +556,22 @@ def gen_analysis_module2():
 
     plt.title("BIỂU ĐỒ LỚP THỰC THỂ PHÂN TÍCH - PHÂN HỆ 2: TÌM KIẾM & XEM SỰ KIỆN", fontsize=12, weight='bold', color='#1E3A8A', pad=15)
 
-    b_sk = UMLBox("SuKien", ["maSuKien", "tenSuKien", "theLoai", "moTa", "hinhAnhPoster", "trangThai"], w=250).place(350, 590)
-    b_tl = UMLBox("TheLoai", ["maTheLoai", "tenTheLoai", "moTa"], w=200).place(60, 590)
-    b_dd = UMLBox("DiaDiem", ["maDiaDiem", "tenDiaDiem", "diaChiChiTiet", "sucChua"], w=220).place(670, 590)
+    b_sk = UMLBox("Event", ["eventId", "title", "category", "description", "bannerUrl", "status"], w=250).place(350, 590)
+    b_tl = UMLBox("Category", ["categoryId", "categoryName", "code"], w=200).place(60, 590)
+    b_dd = UMLBox("Venue", ["venueId", "venueName", "address", "capacity"], w=220).place(670, 590)
 
-    b_sdien = UMLBox("SuatDien", ["maSuatDien", "ngayDien", "thoiGianBatDau", "thoiGianKetThuc"], w=250).place(350, 310)
-    b_ns = UMLBox("NgheSi", ["maNgheSi", "tenNgheSi", "vaiTro", "tieuSu", "hinhAnh"], w=200).place(60, 310)
-    b_yt = UMLBox("SuKienYeuThich", ["maYeuThich", "ngayLuu", "ghiChu"], w=220).place(670, 310)
+    b_sdien = UMLBox("Showtime", ["showtimeId", "showDate", "startTime", "endTime"], w=250).place(350, 310)
+    b_ns = UMLBox("Artist", ["artistId", "stageName", "bio", "avatarUrl"], w=200).place(60, 310)
+    b_yt = UMLBox("FavoriteEvent", ["favoriteId", "customerId", "savedDate"], w=220).place(670, 310)
 
     for b in [b_sk, b_tl, b_dd, b_sdien, b_ns, b_yt]:
         b.draw(ax)
 
-    draw_assoc(ax, b_tl.right, b_sk.left, mult1="1", mult2="*", label="thuộc")
-    draw_assoc(ax, b_sk.right, b_dd.left, mult1="*", mult2="1", label="tổ chức tại")
+    draw_assoc(ax, b_tl.right, b_sk.left, mult1="1", mult2="*", label="categorizes")
+    draw_assoc(ax, b_sk.right, b_dd.left, mult1="*", mult2="1", label="hosts at")
     draw_composition(ax, b_sk.bottom, b_sdien.top, mult1="1", mult2="*")
-    draw_assoc(ax, b_ns.right, b_sdien.left, mult1="*", mult2="*", label="biểu diễn")
-    draw_assoc(ax, b_sk.pt('bottom', 80), b_yt.top, mult1="1", mult2="*", label="được lưu")
+    draw_assoc(ax, b_ns.right, b_sdien.left, mult1="*", mult2="*", label="performs")
+    draw_assoc(ax, b_sk.pt('bottom', 80), b_yt.top, mult1="1", mult2="*", label="saved in")
 
     plt.tight_layout()
     path = os.path.join(OUTPUT_DIR, "analysis_module2.png")
@@ -587,13 +587,13 @@ def gen_analysis_module3():
 
     plt.title("BIỂU ĐỒ LỚP THỰC THỂ PHÂN TÍCH - PHÂN HỆ 3: XẾP HÀNG & CHỌN CHỖ", fontsize=12, weight='bold', color='#1E3A8A', pad=15)
 
-    b_sd = UMLBox("SoDoGhe", ["maSoDo", "tenSoDo", "loaiSanKhau", "tongSoGhe"], w=240).place(380, 660)
-    b_kv = UMLBox("KhuVucGhe", ["maKhuVuc", "tenKhuVuc", "mauSac", "loaiKhuVuc"], w=240).place(380, 460)
-    b_ghe = UMLBox("Ghe", ["maGhe", "hangGhe", "soThuTu", "toaDoX", "toaDoY"], w=240).place(380, 260)
+    b_sd = UMLBox("SeatMap", ["seatMapId", "mapName", "stageType", "totalSeats"], w=240).place(380, 660)
+    b_kv = UMLBox("SeatZone", ["zoneId", "zoneName", "colorHex", "zoneType"], w=240).place(380, 460)
+    b_ghe = UMLBox("Seat", ["seatId", "rowLabel", "seatNumber", "coordinateX", "coordinateY"], w=240).place(380, 260)
 
-    b_kh = UMLBox("KhachHang", ["maNguoiDung", "hoTen", "email"], w=220).place(60, 580)
-    b_hd_ao = UMLBox("HangDoiAo", ["maHangDoi", "soThuTu", "thoiGianVao", "trangThaiCho"], w=220).place(60, 340)
-    b_giu_ghe = UMLBox("GiuGheTamThoi", ["maGiuGhe", "thoiGianBatDau", "thoiGianHetHan", "trangThai"], w=240).place(700, 340)
+    b_kh = UMLBox("Customer", ["userId", "fullName", "email"], w=220).place(60, 580)
+    b_hd_ao = UMLBox("VirtualQueue", ["queueId", "queueNumber", "accessToken", "status"], w=220).place(60, 340)
+    b_giu_ghe = UMLBox("SeatHold", ["holdId", "holdToken", "startTime", "expiresAt"], w=240).place(700, 340)
 
     for b in [b_sd, b_kv, b_ghe, b_kh, b_hd_ao, b_giu_ghe]:
         b.draw(ax)
@@ -601,9 +601,9 @@ def gen_analysis_module3():
     draw_composition(ax, b_sd.bottom, b_kv.top, mult1="1", mult2="*")
     draw_composition(ax, b_kv.bottom, b_ghe.top, mult1="1", mult2="*")
 
-    draw_assoc(ax, b_kh.bottom, b_hd_ao.top, mult1="1", mult2="*", label="tham gia")
-    draw_polyline_assoc(ax, [b_kh.top, (170, 680), (820, 680), b_giu_ghe.top], mult1="1", mult2="*", label="đặt giữ")
-    draw_assoc(ax, b_ghe.right, b_giu_ghe.left, mult1="1..*", mult2="1", label="khóa tạm")
+    draw_assoc(ax, b_kh.bottom, b_hd_ao.top, mult1="1", mult2="*", label="joins")
+    draw_polyline_assoc(ax, [b_kh.top, (170, 680), (820, 680), b_giu_ghe.top], mult1="1", mult2="*", label="holds")
+    draw_assoc(ax, b_ghe.right, b_giu_ghe.left, mult1="1..*", mult2="1", label="locks")
 
     plt.tight_layout()
     path = os.path.join(OUTPUT_DIR, "analysis_module3.png")
@@ -619,22 +619,22 @@ def gen_analysis_module4():
 
     plt.title("BIỂU ĐỒ LỚP THỰC THỂ PHÂN TÍCH - PHÂN HỆ 4: TÍNH TIỀN & XUẤT VÉ", fontsize=12, weight='bold', color='#1E3A8A', pad=15)
 
-    b_hd = UMLBox("HoaDon", ["maHoaDon", "ngayTao", "tongTienTamTinh", "soTienGiam", "tongTienThanhToan", "trangThai"], w=270).place(340, 590)
-    b_mg = UMLBox("MaGiamGia", ["maCode", "tyLeGiam", "giaTriToiDa", "ngayHetHan", "soLuongConLai"], w=220).place(50, 590)
-    b_gd = UMLBox("GiaoDichThanhToan", ["maGiaoDich", "phuongThuc", "maThamChieu", "soTien", "trangThai"], w=230).place(670, 590)
+    b_hd = UMLBox("Order", ["orderId", "orderCode", "subTotal", "discountAmount", "finalTotal", "status"], w=270).place(340, 590)
+    b_mg = UMLBox("Voucher", ["voucherId", "code", "percentOff", "maxDiscount", "validUntil"], w=220).place(50, 590)
+    b_gd = UMLBox("PaymentTransaction", ["transactionId", "transRef", "paymentMethod", "transAmount", "status"], w=230).place(670, 590)
 
-    b_ve = UMLBox("Ve", ["maVe", "maQR", "trangThaiVe", "thoiGianCheckin", "donGia"], w=270).place(340, 290)
-    b_kh = UMLBox("KhachHang", ["maNguoiDung", "hoTen", "email"], w=220).place(50, 290)
-    b_ghe = UMLBox("Ghe", ["maGhe", "hangGhe", "soThuTu"], w=230).place(670, 290)
+    b_ve = UMLBox("Ticket", ["ticketId", "ticketCode", "qrCodeHash", "price", "isUsed"], w=270).place(340, 290)
+    b_kh = UMLBox("Customer", ["userId", "fullName", "email"], w=220).place(50, 290)
+    b_ghe = UMLBox("Seat", ["seatId", "rowLabel", "seatNumber"], w=230).place(670, 290)
 
     for b in [b_hd, b_mg, b_gd, b_ve, b_kh, b_ghe]:
         b.draw(ax)
 
-    draw_assoc(ax, b_mg.right, b_hd.left, mult1="0..1", mult2="*", label="áp dụng")
-    draw_assoc(ax, b_hd.right, b_gd.left, mult1="1", mult2="1", label="thực hiện")
+    draw_assoc(ax, b_mg.right, b_hd.left, mult1="0..1", mult2="*", label="applies")
+    draw_assoc(ax, b_hd.right, b_gd.left, mult1="1", mult2="1", label="pays via")
     draw_composition(ax, b_hd.bottom, b_ve.top, mult1="1", mult2="1..*")
-    draw_assoc(ax, b_kh.right, b_ve.left, mult1="1", mult2="*", label="sở hữu")
-    draw_assoc(ax, b_ve.right, b_ghe.left, mult1="1", mult2="1", label="gán với")
+    draw_assoc(ax, b_kh.right, b_ve.left, mult1="1", mult2="*", label="owns")
+    draw_assoc(ax, b_ve.right, b_ghe.left, mult1="1", mult2="1", label="maps to")
 
     plt.tight_layout()
     path = os.path.join(OUTPUT_DIR, "analysis_module4.png")
@@ -650,25 +650,25 @@ def gen_analysis_module5():
 
     plt.title("BIỂU ĐỒ LỚP THỰC THỂ PHÂN TÍCH - PHÂN HỆ 5: QUẢN LÝ & THỐNG KÊ BTC", fontsize=12, weight='bold', color='#1E3A8A', pad=15)
 
-    b_btc = UMLBox("BanToChuc", ["maNguoiDung", "tenToChuc", "maSoThue", "giayPhep", "thongTinLienHe"], w=250).place(350, 600)
-    b_sk = UMLBox("SuKien", ["maSuKien", "tenSuKien", "theLoai", "moTa", "trangThai"], w=250).place(350, 390)
-    b_sd = UMLBox("SoDoGhe", ["maSoDo", "tenSoDo", "loaiSanKhau", "tongSoGhe"], w=220).place(60, 390)
-    b_sdien = UMLBox("SuatDien", ["maSuatDien", "ngayDien", "thoiGianBatDau", "thoiGianKetThuc"], w=220).place(670, 390)
+    b_btc = UMLBox("Organizer", ["userId", "companyName", "taxId", "businessLicense", "contactInfo"], w=250).place(350, 600)
+    b_sk = UMLBox("Event", ["eventId", "title", "category", "description", "status"], w=250).place(350, 390)
+    b_sd = UMLBox("SeatMap", ["seatMapId", "mapName", "stageType", "totalSeats"], w=220).place(60, 390)
+    b_sdien = UMLBox("Showtime", ["showtimeId", "showDate", "startTime", "endTime"], w=220).place(670, 390)
 
-    b_kv = UMLBox("KhuVucGhe", ["maKhuVuc", "tenKhuVuc", "mauSac", "soLuongGhe"], w=220).place(60, 160)
-    b_gv = UMLBox("GiaVeKhuVuc", ["maGiaVe", "donGia", "soLuongPhatHanh"], w=250).place(350, 160)
-    b_bc = UMLBox("BaoCaoDoanhThu", ["maBaoCao", "tongVeBan", "tongDoanhThu", "ngayLap"], w=220).place(670, 160)
+    b_kv = UMLBox("SeatZone", ["zoneId", "zoneName", "colorHex", "seatCount"], w=220).place(60, 160)
+    b_gv = UMLBox("ZonePricing", ["pricingId", "price", "maxQuota", "soldCount"], w=250).place(350, 160)
+    b_bc = UMLBox("RevenueReport", ["reportId", "totalTicketsSold", "grossRevenue", "occupancyRate"], w=220).place(670, 160)
 
     for b in [b_btc, b_sk, b_sd, b_sdien, b_kv, b_gv, b_bc]:
         b.draw(ax)
 
-    draw_assoc(ax, b_btc.bottom, b_sk.top, mult1="1", mult2="*", label="quản lý")
-    draw_assoc(ax, b_sd.right, b_sk.left, mult1="1", mult2="*", label="áp dụng")
+    draw_assoc(ax, b_btc.bottom, b_sk.top, mult1="1", mult2="*", label="manages")
+    draw_assoc(ax, b_sd.right, b_sk.left, mult1="1", mult2="*", label="applies to")
     draw_composition(ax, b_sk.right, b_sdien.left, mult1="1", mult2="*")
     draw_composition(ax, b_sd.bottom, b_kv.top, mult1="1", mult2="*")
     draw_assoc(ax, b_kv.right, b_gv.left, mult1="1", mult2="*")
     draw_assoc(ax, b_sk.bottom, b_gv.top, mult1="1", mult2="*")
-    draw_assoc(ax, b_sdien.bottom, b_bc.top, mult1="1", mult2="1", label="kết xuất")
+    draw_assoc(ax, b_sdien.bottom, b_bc.top, mult1="1", mult2="1", label="generates")
 
     plt.tight_layout()
     path = os.path.join(OUTPUT_DIR, "analysis_module5.png")

@@ -269,103 +269,103 @@ flowchart LR
 
 ```mermaid
 classDiagram
-    class NguoiDung {
-        maNguoiDung
-        hoTen
+    class User {
+        userId
+        fullName
         email
-        soDienThoai
-        matKhau
-        vaiTro
+        phoneNumber
+        password
+        role
     }
-    class KhachHang {
-        diemTichLuy
-        hangThanhVien
+    class Customer {
+        rewardPoints
+        membershipTier
     }
-    class BanToChuc {
-        tenToChuc
-        maSoThue
-        giayPhep
-        thongTinMoTa
+    class Organizer {
+        organizationName
+        taxCode
+        businessLicense
+        description
     }
-    class DiaDiem {
-        maDiaDiem
-        tenDiaDiem
-        diaChiChiTiet
-        sucChuaToiDa
+    class Venue {
+        venueId
+        venueName
+        detailedAddress
+        maxCapacity
     }
-    class SoDoGhe {
-        maSoDo
-        tenSoDo
-        kieuSanKhau
-        tongSoGhe
+    class SeatMap {
+        seatMapId
+        seatMapName
+        stageType
+        totalSeats
     }
-    class KhuVucGhe {
-        maKhuVuc
-        tenKhuVuc
-        mauSac
-        loaiKhuVuc
-        soLuongGhe
+    class SeatZone {
+        zoneId
+        zoneName
+        colorHex
+        zoneType
+        seatCount
     }
-    class Ghe {
-        maGhe
-        hangGhe
-        soThuTu
-        toaDoX
-        toaDoY
+    class Seat {
+        seatId
+        rowLabel
+        seatNumber
+        coordinateX
+        coordinateY
     }
-    class SuKien {
-        maSuKien
-        tenSuKien
-        theLoai
-        moTa
-        hinhAnh
-        trangThai
+    class Event {
+        eventId
+        title
+        category
+        description
+        posterUrl
+        status
     }
-    class SuatDien {
-        maSuatDien
-        ngayDien
-        thoiGianBatDau
-        thoiGianKetThuc
+    class Showtime {
+        showtimeId
+        showDate
+        startTime
+        endTime
     }
-    class GiaVeKhuVuc {
-        maGiaVe
-        donGia
-        soLuongToiDa
+    class ZonePricing {
+        pricingId
+        unitPrice
+        maxQuota
     }
-    class HangDoiAo {
-        maHangDoi
-        soThuTu
-        thoiGianVao
-        trangThaiCho
+    class VirtualQueue {
+        queueId
+        queueNumber
+        joinedAt
+        status
     }
-    class GiuGheTamThoi {
-        maGiuGhe
-        thoiGianBatDau
-        thoiGianHetHan
-        trangThai
+    class SeatHold {
+        holdId
+        heldAt
+        expiresAt
+        status
     }
-    class HoaDon {
-        maHoaDon
-        ngayTao
-        tongTien
-        soTienGiam
-        trangThai
+    class Order {
+        orderId
+        orderDate
+        totalAmount
+        discountAmount
+        status
     }
 
-    NguoiDung <|-- KhachHang
-    NguoiDung <|-- BanToChuc
-    BanToChuc "1" --> "*" SuKien : quản lý
-    DiaDiem "1" --> "*" SuKien : tổ chức tại
-    DiaDiem "1" --> "*" SoDoGhe : chứa
-    SoDoGhe "1" *-- "*" KhuVucGhe : gồm
-    KhuVucGhe "1" *-- "*" Ghe : gồm
-    SuKien "1" *-- "*" SuatDien : có
-    SuatDien "1" --> "*" GiaVeKhuVuc : áp dụng
-    KhuVucGhe "1" --> "*" GiaVeKhuVuc : định giá
-    KhachHang "1" --> "*" HangDoiAo : tham gia
-    HangDoiAo "1" --> "*" GiuGheTamThoi : chuyển tiếp
-    GiuGheTamThoi "*" --> "1..*" Ghe : khóa tạm
-    KhachHang "1" --> "*" HoaDon : thanh toán
+    User <|-- Customer
+    User <|-- Organizer
+    Organizer "1" --> "*" Event : creates
+    Venue "1" --> "*" Event : hosts at
+    Venue "1" --> "*" SeatMap : has
+    SeatMap "1" *-- "*" SeatZone : contains
+    SeatZone "1" *-- "*" Seat : contains
+    Event "1" *-- "*" Showtime : has
+    Showtime "1" --> "*" ZonePricing : applies
+    SeatZone "1" --> "*" ZonePricing : prices
+    Customer "1" --> "*" VirtualQueue : joins
+    VirtualQueue "1" --> "*" SeatHold : transitions
+    SeatHold "*" --> "1..*" Seat : locks
+    Customer "1" --> "*" Order : pays for
 ```
 
 ---
@@ -373,24 +373,24 @@ classDiagram
 ### 3.2. Biểu đồ lớp phân tích theo từng phân hệ
 
 #### Phân hệ 1: Quản lý tài khoản người dùng
-* Các thực thể: `NguoiDung`, `KhachHang`, `BanToChuc`, `PhienDangNhap`, `ThongBao`.
-* Quan hệ: Kế thừa từ `NguoiDung`; Khách hàng sở hữu nhiều `PhienDangNhap`; Người dùng nhận nhiều `ThongBao`.
+* Các thực thể: `User`, `Customer`, `Organizer`, `UserSession`, `Notification`.
+* Quan hệ: Kế thừa từ `User`; Khách hàng sở hữu nhiều `UserSession`; Người dùng nhận nhiều `Notification`.
 
 #### Phân hệ 2: Tìm kiếm & Xem sự kiện
-* Các thực thể: `SuKien`, `TheLoai`, `DiaDiem`, `SuatDien`, `NgheSi`, `SuKienYeuThich`.
-* Quan hệ: Sự kiện thuộc một Thể loại, tổ chức tại một Địa điểm, bao hàm nhiều Suất diễn; Nghệ sĩ biểu diễn tại nhiều Suất diễn; Khách hàng lưu sự kiện vào danh sách Yêu thích.
+* Các thực thể: `Event`, `Category`, `Venue`, `Showtime`, `Artist`, `FavoriteEvent`.
+* Quan hệ: Sự kiện thuộc một Thể loại (`Category`), tổ chức tại một Địa điểm (`Venue`), bao hàm nhiều Suất diễn (`Showtime`); Nghệ sĩ (`Artist`) biểu diễn tại nhiều Suất diễn; Khách hàng lưu sự kiện vào danh sách Yêu thích (`FavoriteEvent`).
 
 #### Phân hệ 3: Xếp hàng và chọn chỗ
-* Các thực thể: `SoDoGhe`, `KhuVucGhe`, `Ghe`, `KhachHang`, `HangDoiAo`, `GiuGheTamThoi`.
-* Quan hệ: Cấu trúc phân cấp chứa `SoDoGhe` -> `KhuVucGhe` -> `Ghe`; Khách hàng vào `HangDoiAo`; Khi đến lượt tạo bản ghi `GiuGheTamThoi` liên kết với danh sách các `Ghe` đã chọn.
+* Các thực thể: `SeatMap`, `SeatZone`, `Seat`, `Customer`, `VirtualQueue`, `SeatHold`.
+* Quan hệ: Cấu trúc phân cấp chứa `SeatMap` -> `SeatZone` -> `Seat`; Khách hàng vào `VirtualQueue`; Khi đến lượt tạo bản ghi `SeatHold` liên kết với danh sách các `Seat` đã chọn.
 
 #### Phân hệ 4: Tính tiền và Xuất vé
-* Các thực thể: `HoaDon`, `Ve`, `MaGiamGia`, `GiaoDichThanhToan`, `KhachHang`, `Ghe`.
-* Quan hệ: `HoaDon` do `KhachHang` lập, áp dụng 0..1 `MaGiamGia`, thanh toán qua 1 `GiaoDichThanhToan`, và bao hàm 1..* `Ve`. Mỗi `Ve` được gán cố định cho 1 `Ghe`.
+* Các thực thể: `Order`, `Ticket`, `Voucher`, `PaymentTransaction`, `Customer`, `Seat`.
+* Quan hệ: `Order` do `Customer` lập, áp dụng 0..1 `Voucher`, thanh toán qua 1 `PaymentTransaction`, và bao hàm 1..* `Ticket`. Mỗi `Ticket` được gán cố định cho 1 `Seat`.
 
 #### Phân hệ 5: Quản lý và thống kê dành cho BTC
-* Các thực thể: `BanToChuc`, `SuKien`, `SuatDien`, `SoDoGhe`, `KhuVucGhe`, `GiaVeKhuVuc`, `BaoCaoDoanhThu`.
-* Quan hệ: Ban tổ chức quản lý Sự kiện; Sự kiện liên kết Sơ đồ ghế và Suất diễn; Suất diễn định giá qua `GiaVeKhuVuc` và kết xuất `BaoCaoDoanhThu`.
+* Các thực thể: `Organizer`, `Event`, `Showtime`, `SeatMap`, `SeatZone`, `ZonePricing`, `RevenueReport`.
+* Quan hệ: Ban tổ chức (`Organizer`) quản lý Sự kiện (`Event`); Sự kiện liên kết Sơ đồ ghế (`SeatMap`) và Suất diễn (`Showtime`); Suất diễn định giá qua `ZonePricing` và kết xuất `RevenueReport`.
 
 ---
 
