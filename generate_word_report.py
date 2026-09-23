@@ -350,18 +350,100 @@ def build_full_docx():
     add_styled_table(doc, uc5_headers, uc5_data, col_widths=[1.6, 1.2, 2.3, 1.4])
 
     # =========================================================================
-    # PHẦN 3
+    # PHẦN 3: KỊCH BẢN PHÂN TÍCH CHO CÁC CHỨC NĂNG
     # =========================================================================
-    add_heading_1(doc, "3. BIỂU ĐỒ LỚP THỰC THỂ PHÂN TÍCH CHO HỆ THỐNG VÀ CHO CÁC CHỨC NĂNG")
+    add_heading_1(doc, "3. KỊCH BẢN PHÂN TÍCH CHO CÁC CHỨC NĂNG (SCENARIO)")
+    add_body_p(doc, "Dưới đây là kịch bản phân tích chi tiết (Scenario) được xây dựng theo chuẩn mẫu phân tích yêu cầu phần mềm dành riêng cho chức năng đơn lẻ trọng tâm: Chức năng 5 - Xem thống kê doanh thu sự kiện (View Event Revenue Statistics):")
+
+    sc_headers = ["Mục kịch bản", "Nội dung đặc tả chi tiết"]
+    sc_data = [
+        ["Tên use case", "XemThongKeDoanhThuSuKien (ViewEventRevenueStatistics)"],
+        ["Tác nhân chính", "Ban tổ chức sự kiện (Organizer), Quản trị viên (Admin)"],
+        ["Tiền điều kiện", "Khi người dùng muốn xem báo cáo thống kê doanh thu phải đăng nhập thành công vào hệ thống với vai trò Ban tổ chức hoặc Quản trị viên.\nSự kiện đã được khởi tạo, cấu hình phân khu giá vé và đã mở bán vé (phát sinh dữ liệu đơn hàng)."],
+        ["Đảm bảo tối thiểu", "Hệ thống hiển thị thông báo sự kiện chưa có dữ liệu hoặc lỗi kết nối, giữ nguyên giao diện để người dùng chọn lại sự kiện khác."],
+        ["Đảm bảo thành công", "Hệ thống tổng hợp, tính toán đầy đủ và hiển thị chính xác các chỉ số tài chính (Tổng doanh thu gộp, Doanh thu thuần sau thuế và phí, Tỷ lệ lấp đầy khán đài, Giá vé bình quân, Đánh giá hiệu suất) cùng bảng biểu chi tiết và biểu đồ phân bổ doanh thu theo từng phân khu."],
+        ["Kích hoạt", "Người dùng chọn chức năng 'Xem thống kê doanh thu sự kiện' trên thanh menu/bảng điều khiển hệ thống."],
+        ["Chuỗi sự kiện chính:", 
+         "1. Người dùng chọn chức năng 'Xem thống kê doanh thu sự kiện' từ menu điều hướng của hệ thống.\n"
+         "2. Hệ thống hiển thị Form thống kê: yêu cầu người dùng chọn sự kiện từ danh sách sự kiện đang quản lý (eventSelector) và tùy chọn khoảng thời gian lọc (datePicker).\n"
+         "3. Người dùng chọn sự kiện cần xem từ danh sách, chọn khoảng thời gian tra cứu và nhấn nút 'Tra cứu'.\n"
+         "4. Hệ thống kiểm tra dữ liệu sự kiện, nạp danh sách các phân khu vé (ZonePricing), các suất diễn (Showtime) và các hóa đơn vé đã thanh toán thành công.\n"
+         "5. Hệ thống thực hiện chuỗi phương thức tính toán tài chính nội tại:\n"
+         "   - Tính tổng sức chứa phát hành: calculateTotalCapacity()\n"
+         "   - Tính tổng số vé đã bán thành công: calculateTotalTicketsSold()\n"
+         "   - Tính tổng doanh thu bán vé gộp: calculateGrossRevenue()\n"
+         "   - Khấu trừ 10% VAT và 5% phí sàn để tính doanh thu thuần: calculateNetRevenue()\n"
+         "   - Tính tỷ lệ lấp đầy khán đài: calculateOccupancyRate()\n"
+         "   - Tính giá vé bình quân mỗi vé bán ra: calculateAverageTicketPrice()\n"
+         "   - Tính tỷ trọng đóng góp doanh thu của từng phân khu: calculateZoneContribution(zoneId)\n"
+         "   - Đánh giá xếp hạng hiệu quả mở bán: evaluatePerformance()\n"
+         "6. Hệ thống hiển thị toàn bộ các thẻ KPI chỉ số tài chính, bảng chi tiết từng phân khu vé và vẽ biểu đồ tỷ trọng phân bổ doanh thu trực quan."],
+        ["Ngoại lệ:", 
+         "4.a. Sự kiện được chọn chưa có giao dịch bán vé nào phát sinh trong khoảng thời gian tra cứu\n"
+         "     4.a.1. Hệ thống hiển thị thông báo: 'Sự kiện chưa phát sinh giao dịch bán vé'\n"
+         "     4.a.2. Hiển thị các chỉ số ở mức mặc định (0 VNĐ, 0%) và cho phép người dùng chọn lại sự kiện khác.\n"
+         "4.b. Người dùng nhập khoảng thời gian lọc không hợp lệ (Ngày bắt đầu > Ngày kết thúc)\n"
+         "     4.b.1. Hệ thống hiển thị thông báo lỗi: 'Khoảng thời gian tra cứu không hợp lệ'\n"
+         "     4.b.2. Đặt lại khoảng thời gian mặc định là toàn bộ thời gian mở bán của sự kiện.\n"
+         "4.c. Lỗi kết nối máy chủ cơ sở dữ liệu hoặc hệ thống tính toán\n"
+         "     4.c.1. Hệ thống hiển thị thông báo: 'Lỗi kết xuất dữ liệu thống kê, vui lòng thử lại sau'\n"
+         "     4.c.2. Giữ nguyên giao diện ban đầu."]
+    ]
+    add_styled_table(doc, sc_headers, sc_data, col_widths=[2.0, 4.5])
+
+    # =========================================================================
+    # PHẦN 4: KỊCH BẢN VÀ THIẾT KẾ GIAO DIỆN CHO CÁC CHỨC NĂNG
+    # =========================================================================
+    add_heading_1(doc, "4. KỊCH BẢN VÀ THIẾT KẾ GIAO DIỆN CHO CÁC CHỨC NĂNG")
+    add_body_p(doc, "Thiết kế giao diện cho Chức năng 5: Xem thống kê doanh thu sự kiện được xây dựng nhằm cung cấp trải nghiệm phân tích tài chính trực quan, rõ ràng và tức thì cho Ban tổ chức.")
+
+    add_heading_2(doc, "4.1. Bảng đặc tả các thành phần giao diện (UI Controls Specification)")
+    ui_ctrl_headers = ["Mã thành phần", "Tên thành phần", "Kiểu điều khiển (Type)", "Ý nghĩa & Ràng buộc dữ liệu"]
+    ui_ctrl_data = [
+        ["cb_event", "Chọn sự kiện", "ComboBox (Dropdown)", "Danh sách các sự kiện do ban tổ chức quản lý. Ràng buộc: bắt buộc chọn 1 sự kiện."],
+        ["dp_from_date", "Từ ngày", "DatePicker / TextInput", "Ngày bắt đầu lọc số liệu. Định dạng: DD/MM/YYYY. Mặc định: ngày mở bán vé."],
+        ["dp_to_date", "Đến ngày", "DatePicker / TextInput", "Ngày kết thúc lọc số liệu. Định dạng: DD/MM/YYYY. Ràng buộc: >= dp_from_date."],
+        ["btn_search", "Tra cứu", "Button (Primary)", "Kích hoạt gửi yêu cầu tra cứu và tính toán số liệu thống kê."],
+        ["btn_excel", "Xuất Excel", "Button (Success)", "Kết xuất toàn bộ bảng số liệu phân tích ra tệp bảng tính .xlsx."],
+        ["btn_pdf", "In PDF", "Button (Danger)", "Tạo tài liệu báo cáo định dạng .pdf chuẩn hóa để in ấn hoặc ký duyệt."],
+        ["card_gross", "Tổng doanh thu gộp", "KPI Card (Blue)", "Hiển thị tổng số tiền bán vé thu được trước thuế phí."],
+        ["card_net", "Doanh thu thuần", "KPI Card (Green)", "Hiển thị số tiền thực nhận sau khi khấu trừ 10% VAT và 5% phí nền tảng."],
+        ["card_occupancy", "Tỷ lệ lấp đầy", "KPI Card (Amber)", "Hiển thị phần trăm số ghế đã bán trên tổng sức chứa và xếp hạng (EXCELLENT)."],
+        ["card_avg_price", "Giá vé bình quân", "KPI Card (Purple)", "Hiển thị giá bán trung bình trên mỗi vé thành công."],
+        ["chart_zone", "Biểu đồ phân khu", "Donut / Pie Chart", "Biểu đồ trực quan tỷ trọng đóng góp doanh thu của từng phân khu vé."],
+        ["tbl_breakdown", "Bảng chi tiết phân khu", "Data Table", "Liệt kê chi tiết từng phân khu: Đơn giá, Chỉ tiêu, Đã bán, Tỷ lệ lấp đầy, Thành tiền, Tỷ trọng."]
+    ]
+    add_styled_table(doc, ui_ctrl_headers, ui_ctrl_data, col_widths=[1.3, 1.4, 1.4, 2.4])
+
+    add_heading_2(doc, "4.2. Kịch bản tương tác người dùng - hệ thống (UI Interaction Scenario)")
+    ui_flow_headers = ["Bước", "Hành động của người dùng (User Action)", "Phản hồi của hệ thống (System Response)"]
+    ui_flow_data = [
+        ["1", "Người dùng truy cập vào mục 'Thống kê doanh thu' từ menu.", "Hệ thống tải giao diện RevenueReportView, nạp danh sách các sự kiện vào ComboBox, đặt khoảng ngày mặc định là 30 ngày gần nhất."],
+        ["2", "Người dùng nhấp vào ComboBox cb_event và chọn sự kiện 'Born Pink World Tour Hanoi 2026'.", "Hệ thống ghi nhận mã sự kiện eventId, tự động cập nhật ngày mở bán và ngày kết thúc sự kiện vào 2 ô DatePicker."],
+        ["3", "Người dùng nhấp nút 'Tra cứu' (btn_search).", "Giao diện hiển thị biểu tượng tải dữ liệu (loading spinner). Controller nạp Entity RevenueReport, kích hoạt chuỗi tính toán và trả về RevenueSummaryDto."],
+        ["4", "Hệ thống nhận kết quả tính toán thành công.", "Giao diện cập nhật tức thì 4 thẻ KPI, kết xuất biểu đồ Donut tỷ trọng doanh thu bên trái và điền đầy đủ dữ liệu vào bảng chi tiết phân khu bên phải."],
+        ["5", "Người dùng rê chuột vào các phần của biểu đồ Donut.", "Hệ thống hiển thị tooltip chi tiết: Tên phân khu, doanh thu thu được và tỷ lệ phần trăm đóng góp."],
+        ["6", "Người dùng nhấp nút 'Xuất Excel' hoặc 'In PDF'.", "Hệ thống gọi phương thức exportExcel()/exportPdf(), hiển thị hộp thoại tải tệp xuống máy tính của người dùng."]
+    ]
+    add_styled_table(doc, ui_flow_headers, ui_flow_data, col_widths=[0.6, 2.9, 3.0])
+
+    add_heading_2(doc, "4.3. Bản vẽ thiết kế giao diện trực quan (UI Mockup Wireframe)")
+    add_body_p(doc, "Dưới đây là bản vẽ thiết kế giao diện hoàn chỉnh (Mockup Wireframe) của Màn hình Thống kê doanh thu sự kiện (RevenueReportView):")
+    add_diagram_image(doc, "ui_m5_view_revenue.png", "Hình 4.1: Bản vẽ thiết kế giao diện Màn hình Thống kê doanh thu sự kiện (RevenueReportView)")
+
+    # =========================================================================
+    # PHẦN 5: BIỂU ĐỒ LỚP THỰC THỂ PHÂN TÍCH CHO HỆ THỐNG VÀ CHO CÁC CHỨC NĂNG
+    # =========================================================================
+    add_heading_1(doc, "5. BIỂU ĐỒ LỚP THỰC THỂ PHÂN TÍCH CHO HỆ THỐNG VÀ CHO CÁC CHỨC NĂNG")
     
     add_body_p(doc, "Biểu đồ lớp thực thể phân tích (Analysis Entity Class Diagram) là mô hình hướng khái niệm (Conceptual Model), tập trung thể hiện các thực thể thông tin nghiệp vụ cốt lõi của miền bài toán. Theo chuẩn phân tích:", "Nguyên lý xây dựng: ")
     add_bullet_p(doc, "Chỉ bao gồm Tên thực thể và Danh sách thuộc tính nghiệp vụ thuần túy.", "Cấu trúc lớp phân tích: ")
     add_bullet_p(doc, "Không chứa các chi tiết kỹ thuật lập trình như kiểu dữ liệu cụ thể (int, varchar2...), không chứa các phương thức get/set kỹ thuật.", "Độc lập công nghệ: ")
     add_bullet_p(doc, "Tập trung thể hiện mối quan hệ ngữ nghĩa: Kế thừa (Generalization), Kết hợp (Association), Kết tập/Bao hàm (Composition/Aggregation) kèm bản số (Multiplicity: 1, 1..*, 0..1, *).", "Mối quan hệ: ")
 
-    add_heading_2(doc, "3.1. Biểu đồ lớp thực thể phân tích tổng thể hệ thống")
+    add_heading_2(doc, "5.1. Biểu đồ lớp thực thể phân tích tổng thể hệ thống")
     add_body_p(doc, "Biểu đồ bao quát toàn bộ các thực thể phân tích nòng cốt của hệ thống (được đồng bộ chuẩn hóa tên tiếng Anh theo mô hình thiết kế) và các mối liên kết nghiệp vụ giữa chúng:")
-    add_diagram_image(doc, "analysis_tong_the.png", "Hình 3.1: Biểu đồ lớp thực thể phân tích tổng thể toàn hệ thống")
+    add_diagram_image(doc, "analysis_tong_the.png", "Hình 5.1: Biểu đồ lớp thực thể phân tích tổng thể toàn hệ thống")
 
     ana_headers = ["Tên lớp thực thể (Class)", "Ý nghĩa nghiệp vụ", "Các thuộc tính phân tích (Attributes)"]
     ana_data = [
@@ -385,29 +467,29 @@ def build_full_docx():
     add_styled_table(doc, ana_headers, ana_data, col_widths=[1.5, 2.3, 2.7])
 
     # Module 1 Analysis
-    add_heading_2(doc, "3.2. Biểu đồ lớp thực thể phân tích Phân hệ 1: Quản lý tài khoản")
+    add_heading_2(doc, "5.2. Biểu đồ lớp thực thể phân tích Phân hệ 1: Quản lý tài khoản")
     add_body_p(doc, "Thể hiện quan hệ kế thừa giữa User với Customer và Organizer, đồng thời liên kết với UserSession (phiên làm việc) và Notification (thông báo gửi tới người dùng).")
-    add_diagram_image(doc, "analysis_module1.png", "Hình 3.2: Biểu đồ lớp thực thể phân tích - Phân hệ 1: Quản lý tài khoản")
+    add_diagram_image(doc, "analysis_module1.png", "Hình 5.2: Biểu đồ lớp thực thể phân tích - Phân hệ 1: Quản lý tài khoản")
 
     # Module 2 Analysis
-    add_heading_2(doc, "3.3. Biểu đồ lớp thực thể phân tích Phân hệ 2: Tìm kiếm & Xem sự kiện")
+    add_heading_2(doc, "5.3. Biểu đồ lớp thực thể phân tích Phân hệ 2: Tìm kiếm & Xem sự kiện")
     add_body_p(doc, "Mô hình hóa thực thể Event liên kết với Category, Venue tổ chức, dàn Artist biểu diễn và danh sách FavoriteEvent của khách hàng.")
-    add_diagram_image(doc, "analysis_module2.png", "Hình 3.3: Biểu đồ lớp thực thể phân tích - Phân hệ 2: Tìm kiếm & Xem sự kiện")
+    add_diagram_image(doc, "analysis_module2.png", "Hình 5.3: Biểu đồ lớp thực thể phân tích - Phân hệ 2: Tìm kiếm & Xem sự kiện")
 
     # Module 3 Analysis
-    add_heading_2(doc, "3.4. Biểu đồ lớp thực thể phân tích Phân hệ 3: Xếp hàng và chọn chỗ")
+    add_heading_2(doc, "5.4. Biểu đồ lớp thực thể phân tích Phân hệ 3: Xếp hàng và chọn chỗ")
     add_body_p(doc, "Mô hình hóa cấu trúc phân cấp không gian từ SeatMap -> SeatZone -> Seat, kết hợp với VirtualQueue và thực thể SeatHold khóa giữ các ghế được chọn.")
-    add_diagram_image(doc, "analysis_module3.png", "Hình 3.4: Biểu đồ lớp thực thể phân tích - Phân hệ 3: Xếp hàng và chọn chỗ")
+    add_diagram_image(doc, "analysis_module3.png", "Hình 5.4: Biểu đồ lớp thực thể phân tích - Phân hệ 3: Xếp hàng và chọn chỗ")
 
     # Module 4 Analysis
-    add_heading_2(doc, "3.5. Biểu đồ lớp thực thể phân tích Phân hệ 4: Tính tiền và Xuất vé")
+    add_heading_2(doc, "5.5. Biểu đồ lớp thực thể phân tích Phân hệ 4: Tính tiền và Xuất vé")
     add_body_p(doc, "Order đóng vai trò trung tâm liên kết với Voucher (0..1), PaymentTransaction (1) và chứa tập hợp các Ticket (1..*), mỗi Ticket tương ứng một Seat duy nhất.")
-    add_diagram_image(doc, "analysis_module4.png", "Hình 3.5: Biểu đồ lớp thực thể phân tích - Phân hệ 4: Tính tiền và Xuất vé")
+    add_diagram_image(doc, "analysis_module4.png", "Hình 5.5: Biểu đồ lớp thực thể phân tích - Phân hệ 4: Tính tiền và Xuất vé")
 
     # Module 5 Analysis - Focused Single Feature
-    add_heading_2(doc, "3.6. Biểu đồ lớp thực thể phân tích Chức năng 5: Xem thống kê doanh thu sự kiện")
+    add_heading_2(doc, "5.6. Biểu đồ lớp thực thể phân tích Chức năng 5: Xem thống kê doanh thu sự kiện")
     add_body_p(doc, "Để đáp ứng nguyên tắc hướng đối tượng cốt lõi (Lớp phải đóng gói trạng thái và hành vi tính toán nghiệp vụ, không chỉ là tập hợp dữ liệu thụ động/Anemic Domain Model), biểu đồ lớp phân tích dưới đây thể hiện chi tiết các thực thể tham gia ca sử dụng đơn lẻ 'Xem thống kê doanh thu sự kiện' cùng các phương thức tính toán tài chính trọng tâm. Toàn bộ tên lớp, thuộc tính và phương thức được chuẩn hóa đồng nhất 100% với pha thiết kế:")
-    add_diagram_image(doc, "analysis_m5_view_revenue_detail.png", "Hình 3.6: Biểu đồ lớp thực thể phân tích - Chức năng Xem thống kê doanh thu sự kiện")
+    add_diagram_image(doc, "analysis_m5_view_revenue_detail.png", "Hình 5.6: Biểu đồ lớp thực thể phân tích - Chức năng Xem thống kê doanh thu sự kiện")
 
     ana_m5_headers = ["Lớp phân tích", "Các thuộc tính phân tích cốt lõi", "Các phương thức thực hiện tính toán (Operations)"]
     ana_m5_data = [
@@ -427,9 +509,9 @@ def build_full_docx():
     add_styled_table(doc, ana_m5_headers, ana_m5_data, col_widths=[1.5, 2.5, 2.5])
 
     # =========================================================================
-    # PHẦN 4
+    # PHẦN 6: BIỂU ĐỒ LỚP THỰC THỂ THIẾT KẾ CHO HỆ THỐNG VÀ CHO CÁC CHỨC NĂNG
     # =========================================================================
-    add_heading_1(doc, "4. BIỂU ĐỒ LỚP THỰC THỂ THIẾT KẾ CHO HỆ THỐNG VÀ CHO CÁC CHỨC NĂNG")
+    add_heading_1(doc, "6. BIỂU ĐỒ LỚP THỰC THỂ THIẾT KẾ CHO HỆ THỐNG VÀ CHO CÁC CHỨC NĂNG")
     
     add_body_p(doc, "Biểu đồ lớp thực thể thiết kế (Design Entity Class Diagram) là mô hình mức thiết kế chi tiết (Detailed Object-Oriented Design), sẵn sàng cho việc sinh mã nguồn trong các ngôn ngữ lập trình hiện đại (Java Spring Boot, C# .NET Core, TypeScript) và ánh xạ quan hệ ORM (Hibernate / JPA).", "Nguyên lý xây dựng: ")
     add_bullet_p(doc, "Stereotype <<entity>> định danh các lớp thực thể lưu trữ dữ liệu.", "Stereotype chuẩn: ")
@@ -437,14 +519,14 @@ def build_full_docx():
     add_bullet_p(doc, "Xác định rõ các thuộc tính định danh khóa chính (Primary Key - id: Long) và các ràng buộc toàn vẹn.", "Khóa chính và ràng buộc: ")
     add_bullet_p(doc, "Bao gồm các phương thức nghiệp vụ nội tại của đối tượng (ví dụ: isAvailable(), lock(), calculateTotal(), generateQR()).", "Phương thức nghiệp vụ: ")
 
-    add_heading_2(doc, "4.1. Biểu đồ lớp thực thể thiết kế tổng thể hệ thống")
+    add_heading_2(doc, "6.1. Biểu đồ lớp thực thể thiết kế tổng thể hệ thống")
     add_body_p(doc, "Biểu đồ lớp thực thể thiết kế tổng thể thể hiện mối liên kết chặt chẽ giữa tất cả các thực thể nghiệp vụ trong hệ thống:")
-    add_diagram_image(doc, "design_tong_the.png", "Hình 4.1: Biểu đồ lớp thực thể thiết kế tổng thể toàn hệ thống")
+    add_diagram_image(doc, "design_tong_the.png", "Hình 6.1: Biểu đồ lớp thực thể thiết kế tổng thể toàn hệ thống")
 
     # Module 1 Design
-    add_heading_2(doc, "4.2. Biểu đồ lớp thực thể thiết kế Phân hệ 1: Quản lý tài khoản")
+    add_heading_2(doc, "6.2. Biểu đồ lớp thực thể thiết kế Phân hệ 1: Quản lý tài khoản")
     add_body_p(doc, "Mô hình thiết kế chi tiết các lớp User, Customer, Organizer, UserSession và Notification:")
-    add_diagram_image(doc, "design_module1.png", "Hình 4.2: Biểu đồ lớp thực thể thiết kế - Phân hệ 1: Quản lý tài khoản")
+    add_diagram_image(doc, "design_module1.png", "Hình 6.2: Biểu đồ lớp thực thể thiết kế - Phân hệ 1: Quản lý tài khoản")
 
     d1_headers = ["Lớp thiết kế", "Thuộc tính chi tiết (Kiểu dữ liệu & Ràng buộc)", "Phương thức nghiệp vụ (Operations)"]
     d1_data = [
@@ -457,9 +539,9 @@ def build_full_docx():
     add_styled_table(doc, d1_headers, d1_data, col_widths=[1.5, 2.5, 2.5])
 
     # Module 2 Design
-    add_heading_2(doc, "4.3. Biểu đồ lớp thực thể thiết kế Phân hệ 2: Tìm kiếm & Xem sự kiện")
+    add_heading_2(doc, "6.3. Biểu đồ lớp thực thể thiết kế Phân hệ 2: Tìm kiếm & Xem sự kiện")
     add_body_p(doc, "Mô hình thiết kế chi tiết các lớp Event, Showtime, Category, Venue, Artist và FavoriteEvent:")
-    add_diagram_image(doc, "design_module2.png", "Hình 4.3: Biểu đồ lớp thực thể thiết kế - Phân hệ 2: Tìm kiếm & Xem sự kiện")
+    add_diagram_image(doc, "design_module2.png", "Hình 6.3: Biểu đồ lớp thực thể thiết kế - Phân hệ 2: Tìm kiếm & Xem sự kiện")
 
     d2_headers = ["Lớp thiết kế", "Thuộc tính chi tiết (Kiểu dữ liệu & Ràng buộc)", "Phương thức nghiệp vụ (Operations)"]
     d2_data = [
@@ -473,9 +555,9 @@ def build_full_docx():
     add_styled_table(doc, d2_headers, d2_data, col_widths=[1.5, 2.5, 2.5])
 
     # Module 3 Design
-    add_heading_2(doc, "4.4. Biểu đồ lớp thực thể thiết kế Phân hệ 3: Xếp hàng và chọn chỗ")
+    add_heading_2(doc, "6.4. Biểu đồ lớp thực thể thiết kế Phân hệ 3: Xếp hàng và chọn chỗ")
     add_body_p(doc, "Mô hình thiết kế chi tiết các lớp SeatMap, SeatZone, Seat, VirtualQueue và SeatHold:")
-    add_diagram_image(doc, "design_module3.png", "Hình 4.4: Biểu đồ lớp thực thể thiết kế - Phân hệ 3: Xếp hàng và chọn chỗ")
+    add_diagram_image(doc, "design_module3.png", "Hình 6.4: Biểu đồ lớp thực thể thiết kế - Phân hệ 3: Xếp hàng và chọn chỗ")
 
     d3_headers = ["Lớp thiết kế", "Thuộc tính chi tiết (Kiểu dữ liệu & Ràng buộc)", "Phương thức nghiệp vụ (Operations)"]
     d3_data = [
@@ -488,9 +570,9 @@ def build_full_docx():
     add_styled_table(doc, d3_headers, d3_data, col_widths=[1.5, 2.5, 2.5])
 
     # Module 4 Design
-    add_heading_2(doc, "4.5. Biểu đồ lớp thực thể thiết kế Phân hệ 4: Tính tiền và Xuất vé")
+    add_heading_2(doc, "6.5. Biểu đồ lớp thực thể thiết kế Phân hệ 4: Tính tiền và Xuất vé")
     add_body_p(doc, "Mô hình thiết kế chi tiết các lớp Order, Voucher, PaymentTransaction và Ticket:")
-    add_diagram_image(doc, "design_module4.png", "Hình 4.5: Biểu đồ lớp thực thể thiết kế - Phân hệ 4: Tính tiền và Xuất vé")
+    add_diagram_image(doc, "design_module4.png", "Hình 6.5: Biểu đồ lớp thực thể thiết kế - Phân hệ 4: Tính tiền và Xuất vé")
 
     d4_headers = ["Lớp thiết kế", "Thuộc tính chi tiết (Kiểu dữ liệu & Ràng buộc)", "Phương thức nghiệp vụ (Operations)"]
     d4_data = [
@@ -502,29 +584,16 @@ def build_full_docx():
     add_styled_table(doc, d4_headers, d4_data, col_widths=[1.5, 2.5, 2.5])
 
     # Module 5 Design - Focused Single Feature
-    add_heading_2(doc, "4.6. Biểu đồ lớp thực thể thiết kế Chức năng 5: Xem thống kê doanh thu sự kiện")
-    add_body_p(doc, "Chức năng 'Xem thống kê doanh thu sự kiện' (View Event Revenue Statistics) là chức năng đơn lẻ (Single Atomic Function - Read/Calculate Analytics) phụ trách toàn bộ việc tính toán và kết xuất báo cáo tài chính cho sự kiện. Dưới đây là thiết kế chi tiết bao gồm đặc tả Use Case, biểu đồ tuần tự tương tác BCE, biểu đồ lớp thiết kế BCE và bảng thuật toán chi tiết cho các phương thức tính toán:")
+    add_heading_2(doc, "6.6. Biểu đồ lớp thực thể thiết kế Chức năng 5: Xem thống kê doanh thu sự kiện")
+    add_body_p(doc, "Chức năng 'Xem thống kê doanh thu sự kiện' (View Event Revenue Statistics) là chức năng đơn lẻ (Single Atomic Function - Read/Calculate Analytics) phụ trách toàn bộ việc tính toán và kết xuất báo cáo tài chính cho sự kiện. Dưới đây là thiết kế chi tiết bao gồm biểu đồ tuần tự tương tác BCE, biểu đồ lớp thiết kế BCE & DTO, bảng từ điển lớp thiết kế, bảng thuật toán chi tiết cho các phương thức tính toán và các ghi chú kiến trúc:")
 
-    add_heading_3(doc, "a. Đặc tả ca sử dụng chi tiết (Use Case Specification)")
-    uc_spec_headers = ["Thuộc tính đặc tả", "Nội dung chi tiết"]
-    uc_spec_data = [
-        ["Tên chức năng / Use Case", "Xem thống kê doanh thu sự kiện (View Event Revenue Statistics)"],
-        ["Phân hệ trực thuộc", "Module 5: Quản lý và thống kê dành cho Ban tổ chức"],
-        ["Tác nhân (Actor)", "Ban tổ chức sự kiện (Organizer), Quản trị viên (Admin)"],
-        ["Mục tiêu nghiệp vụ", "Cung cấp bức tranh tài chính toàn cảnh của sự kiện: doanh thu gộp, doanh thu thuần sau thuế và phí sàn, tỷ lệ lấp đầy khán đài, giá vé bình quân và xếp hạng hiệu suất mở bán."],
-        ["Tiền điều kiện (Pre-conditions)", "1. Ban tổ chức đã đăng nhập thành công vào hệ thống.\n2. Sự kiện đã được cấu hình sơ đồ ghế và đã phát sinh giao dịch bán vé."],
-        ["Hậu điều kiện (Post-conditions)", "Hệ thống tổng hợp và hiển thị trực quan các chỉ số tài chính (KPIs) cùng biểu đồ phân bổ doanh thu theo từng khu vực khán đài."],
-        ["Luồng sự kiện chính (Main Flow)", "1. Ban tổ chức chọn sự kiện cần xem từ danh sách sự kiện do mình quản lý.\n2. Giao diện RevenueReportView gửi yêu cầu tra cứu tới RevenueReportController.\n3. Controller khởi tạo đối tượng RevenueReport nạp dữ liệu cấu hình vé và các giao dịch.\n4. RevenueReport thực hiện chuỗi phương thức tính toán nội tại: calculateGrossRevenue(), calculateNetRevenue(), calculateOccupancyRate(), evaluatePerformance().\n5. Controller đóng gói kết quả vào RevenueSummaryDto và trả về cho RevenueReportView.\n6. Giao diện kết xuất các thẻ KPI và biểu đồ phân bổ doanh thu trực quan."]
-    ]
-    add_styled_table(doc, uc_spec_headers, uc_spec_data, col_widths=[2.2, 4.3])
-
-    add_heading_3(doc, "b. Biểu đồ tuần tự (Sequence Diagram) thể hiện tương tác BCE")
+    add_heading_3(doc, "a. Biểu đồ tuần tự (Sequence Diagram) thể hiện tương tác BCE")
     add_body_p(doc, "Biểu đồ tuần tự thể hiện sự tương tác mạch lạc giữa tác nhân Ban tổ chức, lớp Boundary (Giao diện), lớp Control (Điều phối) và các lớp Entity (Thực thể tính toán):")
-    add_diagram_image(doc, "seq_m5_view_revenue.png", "Hình 4.6: Biểu đồ tuần tự ca sử dụng Xem thống kê doanh thu sự kiện")
+    add_diagram_image(doc, "seq_m5_view_revenue.png", "Hình 6.6: Biểu đồ tuần tự ca sử dụng Xem thống kê doanh thu sự kiện")
 
-    add_heading_3(doc, "c. Biểu đồ lớp thiết kế chi tiết theo mô hình BCE & DTO")
+    add_heading_3(doc, "b. Biểu đồ lớp thiết kế chi tiết theo mô hình BCE & DTO")
     add_body_p(doc, "Mô hình thiết kế 3 lớp (Boundary - Control - Entity) kết hợp tầng DTO làm nổi bật các phương thức tính toán nghiệp vụ trong các lớp thực thể RevenueReport và ZonePricing. Toàn bộ tên biến, kiểu dữ liệu chuẩn và phương thức tương ứng đồng nhất 100% với pha phân tích:")
-    add_diagram_image(doc, "design_m5_view_revenue_detail.png", "Hình 4.7: Biểu đồ lớp thiết kế chi tiết (BCE & DTO) chức năng Thống kê doanh thu")
+    add_diagram_image(doc, "design_m5_view_revenue_detail.png", "Hình 6.7: Biểu đồ lớp thiết kế chi tiết (BCE & DTO) chức năng Thống kê doanh thu")
 
     d5_detail_headers = ["Lớp thiết kế", "Thuộc tính chi tiết (Kiểu dữ liệu & Ràng buộc)", "Phương thức nghiệp vụ & Tính toán"]
     d5_detail_data = [
@@ -594,19 +663,23 @@ def build_full_docx():
 
     # Final summary conclusion
     add_heading_1(doc, "KẾT LUẬN VÀ CAM KẾT HOÀN THÀNH")
-    add_body_p(doc, "Tài liệu phân tích và thiết kế hệ thống trên đã hoàn thiện đầy đủ 4 yêu cầu kiểm tra môn học theo đúng đề cương bài tập lớn do Thầy Nguyễn Đức Hiển giao:")
-    add_bullet_p(doc, "Đầy đủ thông tin nhóm, đề tài, phân công nhiệm vụ và phạm vi 5 module chức năng cho các thành viên.", "1. Thông tin nhóm: ")
-    add_bullet_p(doc, "Biểu đồ Use Case tổng thể toàn hệ thống và 5 biểu đồ Use Case phân rã chi tiết cho từng phân hệ kèm bảng đặc tả tóm tắt nghiệp vụ.", "2. Biểu đồ Use Case: ")
-    add_bullet_p(doc, "Biểu đồ lớp thực thể phân tích tổng thể và 5 biểu đồ lớp thực thể phân tích phân rã theo 5 module, thể hiện đúng bản chất mô hình hóa khái niệm miền bài toán.", "3. Biểu đồ lớp phân tích: ")
-    add_bullet_p(doc, "Biểu đồ lớp thực thể thiết kế tổng thể và 5 biểu đồ lớp thực thể thiết kế chi tiết theo 5 module với cấu trúc 3 ngăn chuẩn UML, kiểu dữ liệu chặt chẽ, ràng buộc khóa chính và phương thức nghiệp vụ.", "4. Biểu đồ lớp thiết kế: ")
+    add_body_p(doc, "Tài liệu phân tích và thiết kế hệ thống trên đã hoàn thiện đầy đủ 6 yêu cầu kiểm tra môn học theo đúng đề cương bài tập lớn do Thầy Nguyễn Đức Hiển giao:")
+    add_bullet_p(doc, "Đầy đủ thông tin nhóm, tên đề tài, phân công nhiệm vụ và phạm vi chức năng cho từng thành viên.", "1. Thông tin nhóm: ")
+    add_bullet_p(doc, "Biểu đồ Use Case tổng thể toàn hệ thống và các biểu đồ Use Case phân rã chi tiết cho từng chức năng kèm bảng đặc tả tóm tắt nghiệp vụ.", "2. Biểu đồ Use Case: ")
+    add_bullet_p(doc, "Kịch bản phân tích (Scenario) chuẩn hóa với các trường Tác nhân, Tiền điều kiện, Đảm bảo tối thiểu/thành công, Chuỗi sự kiện chính và Luồng ngoại lệ.", "3. Kịch bản phân tích: ")
+    add_bullet_p(doc, "Bảng đặc tả thành phần điều khiển UI, kịch bản tương tác người dùng - hệ thống và bản vẽ thiết kế giao diện (Mockup Wireframe) trực quan.", "4. Kịch bản & Thiết kế giao diện: ")
+    add_bullet_p(doc, "Biểu đồ lớp thực thể phân tích tổng thể và các phân hệ, thể hiện đúng bản chất mô hình hóa khái niệm miền bài toán với các phương thức tính toán đóng gói.", "5. Biểu đồ lớp phân tích: ")
+    add_bullet_p(doc, "Biểu đồ lớp thực thể thiết kế tổng thể và chi tiết theo mô hình 3 lớp (BCE & DTO) với kiểu dữ liệu chặt chẽ, ràng buộc khóa chính và bảng thuật toán các phương thức tính toán.", "6. Biểu đồ lớp thiết kế: ")
 
-    try:
-        doc.save(DOCX_OUT)
-        print(f"Document successfully generated and saved to: {DOCX_OUT}")
-    except PermissionError:
-        alt_out = os.path.join(BASE_DIR, "N12 Nhóm 01 - HoanChinh.docx")
-        doc.save(alt_out)
-        print(f"Note: '{DOCX_OUT}' is currently open in Word. Saved successfully to: {alt_out}")
+    # Save to multiple target filenames to ensure full compatibility
+    targets = ["N13 Nhóm 01.docx", "N12 Nhóm 01 - HoanChinh.docx", "N12 Nhóm 01.docx"]
+    for t_name in targets:
+        out_path = os.path.join(BASE_DIR, t_name)
+        try:
+            doc.save(out_path)
+            print(f"Document successfully generated and saved to: {out_path}")
+        except PermissionError:
+            print(f"Note: '{t_name}' is currently locked by Word, skipped overwriting.")
 
 if __name__ == "__main__":
     build_full_docx()

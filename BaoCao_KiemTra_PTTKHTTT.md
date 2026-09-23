@@ -258,7 +258,66 @@ flowchart TB
 
 ---
 
-## 3. BIỂU ĐỒ LỚP THỰC THỂ PHÂN TÍCH CHO HỆ THỐNG VÀ CHO CÁC CHỨC NĂNG
+## 3. KỊCH BẢN PHÂN TÍCH CHO CÁC CHỨC NĂNG (SCENARIO)
+
+Dưới đây là kịch bản phân tích chi tiết (Scenario) được xây dựng theo format chuẩn của môn học dành riêng cho **Chức năng 5: Xem thống kê doanh thu sự kiện** (*View Event Revenue Statistics*):
+
+### Scenario cho chức năng: Xem thống kê doanh thu sự kiện
+
+| Mục kịch bản | Nội dung chi tiết |
+|:---|:---|
+| **Tên use case** | `XemThongKeDoanhThuSuKien` (`ViewEventRevenueStatistics`) |
+| **Tác nhân chính** | Ban tổ chức sự kiện (`Organizer`), Quản trị viên (`Admin`) |
+| **Tiền điều kiện** | Khi người dùng muốn xem báo cáo thống kê doanh thu phải đăng nhập thành công vào hệ thống với vai trò Ban tổ chức hoặc Quản trị viên.<br>Sự kiện đã được tạo, cấu hình phân khu giá vé và đã mở bán vé (phát sinh dữ liệu đơn hàng). |
+| **Đảm bảo tối thiểu** | Hệ thống hiển thị thông báo sự kiện chưa có dữ liệu hoặc lỗi kết nối, giữ nguyên giao diện để người dùng chọn lại sự kiện khác. |
+| **Đảm bảo thành công** | Hệ thống tổng hợp, tính toán đầy đủ và hiển thị chính xác các chỉ số tài chính (Tổng doanh thu gộp, Doanh thu thuần sau thuế và phí, Tỷ lệ lấp đầy khán đài, Giá vé bình quân, Đánh giá hiệu suất) cùng bảng biểu chi tiết và biểu đồ phân bổ doanh thu theo từng phân khu. |
+| **Kích hoạt** | Người dùng chọn chức năng 'Xem thống kê doanh thu sự kiện' trên thanh menu/bảng điều khiển hệ thống. |
+| **Chuỗi sự kiện chính:** | 1. Người dùng chọn chức năng 'Xem thống kê doanh thu sự kiện' từ menu điều hướng của hệ thống.<br>2. Hệ thống hiển thị Form thống kê: yêu cầu người dùng chọn sự kiện từ danh sách sự kiện đang quản lý (`eventSelector`) và tùy chọn khoảng thời gian lọc (`datePicker`).<br>3. Người dùng chọn sự kiện cần xem từ danh sách, chọn khoảng thời gian tra cứu và nhấn nút 'Tra cứu'.<br>4. Hệ thống kiểm tra dữ liệu sự kiện, nạp danh sách các phân khu vé (`ZonePricing`), các suất diễn (`Showtime`) và các hóa đơn vé đã thanh toán thành công.<br>5. Hệ thống thực hiện chuỗi phương thức tính toán tài chính nội tại:<br>&nbsp;&nbsp;&nbsp;• Tính tổng sức chứa phát hành: `calculateTotalCapacity()`<br>&nbsp;&nbsp;&nbsp;• Tính tổng số vé đã bán thành công: `calculateTotalTicketsSold()`<br>&nbsp;&nbsp;&nbsp;• Tính tổng doanh thu bán vé gộp: `calculateGrossRevenue()`<br>&nbsp;&nbsp;&nbsp;• Khấu trừ 10% VAT và 5% phí sàn để tính doanh thu thuần: `calculateNetRevenue()`<br>&nbsp;&nbsp;&nbsp;• Tính tỷ lệ lấp đầy khán đài: `calculateOccupancyRate()`<br>&nbsp;&nbsp;&nbsp;• Tính giá vé bình quân mỗi vé bán ra: `calculateAverageTicketPrice()`<br>&nbsp;&nbsp;&nbsp;• Tính tỷ trọng đóng góp doanh thu của từng phân khu: `calculateZoneContribution(zoneId)`<br>&nbsp;&nbsp;&nbsp;• Đánh giá xếp hạng hiệu quả mở bán: `evaluatePerformance()`<br>6. Hệ thống hiển thị toàn bộ các thẻ KPI chỉ số tài chính, bảng chi tiết từng phân khu vé và vẽ biểu đồ tỷ trọng phân bổ doanh thu trực quan. |
+| **Ngoại lệ:** | **4.a. Sự kiện được chọn chưa có giao dịch bán vé nào phát sinh trong khoảng thời gian tra cứu**<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.a.1. Hệ thống hiển thị thông báo: 'Sự kiện chưa phát sinh giao dịch bán vé'<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.a.2. Hiển thị các chỉ số ở mức mặc định (0 VNĐ, 0%) và cho phép người dùng chọn lại sự kiện khác.<br>**4.b. Người dùng nhập khoảng thời gian lọc không hợp lệ (Ngày bắt đầu > Ngày kết thúc)**<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.b.1. Hệ thống hiển thị thông báo lỗi: 'Khoảng thời gian tra cứu không hợp lệ'<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.b.2. Đặt lại khoảng thời gian mặc định là toàn bộ thời gian mở bán của sự kiện.<br>**4.c. Lỗi kết nối máy chủ cơ sở dữ liệu hoặc hệ thống tính toán**<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.c.1. Hệ thống hiển thị thông báo: 'Lỗi kết xuất dữ liệu thống kê, vui lòng thử lại sau'<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.c.2. Giữ nguyên giao diện ban đầu. |
+
+---
+
+## 4. KỊCH BẢN VÀ THIẾT KẾ GIAO DIỆN CHO CÁC CHỨC NĂNG
+
+Thiết kế giao diện cho **Chức năng 5: Xem thống kê doanh thu sự kiện** (`RevenueReportView`) được tối ưu hóa nhằm cung cấp trải nghiệm phân tích tài chính trực quan, rõ ràng và tức thì cho Ban tổ chức.
+
+### 4.1. Bảng đặc tả các thành phần điều khiển trên giao diện (UI Controls Specification)
+
+| Mã điều khiển | Tên thành phần | Kiểu điều khiển (Type) | Ý nghĩa nghiệp vụ & Ràng buộc dữ liệu |
+|:---|:---|:---|:---|
+| `cb_event` | Chọn sự kiện | ComboBox (Dropdown) | Danh sách các sự kiện do ban tổ chức quản lý. Ràng buộc: bắt buộc chọn 1 sự kiện. |
+| `dp_from_date`| Từ ngày | DatePicker / TextInput | Ngày bắt đầu lọc số liệu (DD/MM/YYYY). Mặc định: ngày mở bán vé đầu tiên. |
+| `dp_to_date` | Đến ngày | DatePicker / TextInput | Ngày kết thúc lọc số liệu (DD/MM/YYYY). Ràng buộc: phải $\ge$ `dp_from_date`. |
+| `btn_search` | Tra cứu | Button (Primary Blue) | Kích hoạt gửi yêu cầu tra cứu và tính toán số liệu thống kê. |
+| `btn_excel` | Xuất Excel | Button (Success Green) | Kết xuất toàn bộ bảng số liệu phân tích ra tệp bảng tính `.xlsx`. |
+| `btn_pdf` | In PDF | Button (Danger Red) | Tạo tài liệu báo cáo định dạng `.pdf` chuẩn hóa để in ấn hoặc ký duyệt. |
+| `card_gross` | Tổng doanh thu gộp | KPI Card (Blue) | Hiển thị tổng số tiền bán vé thu được trước thuế phí (`Gross Revenue`). |
+| `card_net` | Doanh thu thuần | KPI Card (Green) | Hiển thị số tiền thực nhận sau khi khấu trừ 10% VAT và 5% phí nền tảng (`Net Revenue`). |
+| `card_occupancy`| Tỷ lệ lấp đầy | KPI Card (Amber) | Hiển thị phần trăm số ghế đã bán trên tổng sức chứa và xếp hạng (`EXCELLENT`). |
+| `card_avg_price`| Giá vé bình quân | KPI Card (Purple) | Hiển thị giá bán trung bình trên mỗi vé thành công (`Average Ticket Price`). |
+| `chart_zone` | Biểu đồ phân bổ phân khu | Donut Chart | Biểu đồ tròn trực quan tỷ trọng đóng góp doanh thu của từng phân khu vé. |
+| `tbl_breakdown`| Bảng chi tiết phân khu | Data Table | Liệt kê chi tiết từng phân khu: Đơn giá, Chỉ tiêu, Đã bán, Tỷ lệ lấp đầy, Doanh thu gộp, Tỷ trọng. |
+
+### 4.2. Kịch bản tương tác người dùng - hệ thống (UI Interaction Scenario)
+
+| Bước | Hành động của người dùng (User Action) | Phản hồi của hệ thống (System Response) |
+|:---:|:---|:---|
+| **1** | Người dùng truy cập vào mục 'Thống kê doanh thu' từ menu hệ thống. | Hệ thống tải giao diện `RevenueReportView`, nạp danh sách các sự kiện vào `cb_event`, đặt khoảng ngày mặc định là 30 ngày gần nhất. |
+| **2** | Người dùng nhấp vào `cb_event` và chọn sự kiện "Born Pink World Tour Hanoi 2026". | Hệ thống ghi nhận mã sự kiện `eventId`, tự động cập nhật ngày mở bán và ngày kết thúc sự kiện vào 2 ô DatePicker. |
+| **3** | Người dùng nhấp nút 'Tra cứu' (`btn_search`). | Giao diện hiển thị biểu tượng tải dữ liệu (loading spinner). Controller nạp Entity `RevenueReport`, kích hoạt chuỗi tính toán và trả về `RevenueSummaryDto`. |
+| **4** | Hệ thống nhận kết quả tính toán thành công. | Giao diện cập nhật tức thì 4 thẻ KPI, kết xuất biểu đồ Donut tỷ trọng doanh thu bên trái và điền đầy đủ dữ liệu vào bảng chi tiết phân khu bên phải. |
+| **5** | Người dùng rê chuột vào các phần của biểu đồ Donut. | Hệ thống hiển thị tooltip chi tiết: Tên phân khu, doanh thu thu được và tỷ lệ phần trăm đóng góp. |
+| **6** | Người dùng nhấp nút 'Xuất Excel' hoặc 'In PDF'. | Hệ thống gọi phương thức `exportExcel()` / `exportPdf()`, hiển thị hộp thoại tải tệp xuống máy tính của người dùng. |
+
+### 4.3. Bản vẽ thiết kế giao diện trực quan (UI Mockup Wireframe)
+
+Toàn bộ bố cục màn hình được phân chia khoa học thành 4 vùng chức năng (Thanh điều hướng bộ lọc $\rightarrow$ Khung thẻ KPI $\rightarrow$ Khung biểu đồ Donut $\rightarrow$ Bảng phân tích chi tiết):
+
+*(Tham khảo tệp ảnh thiết kế độ phân giải cao đính kèm: `PTTK/diagrams/ui_m5_view_revenue.png`)*
+
+---
+
+## 5. BIỂU ĐỒ LỚP THỰC THỂ PHÂN TÍCH CHO HỆ THỐNG VÀ CHO CÁC CHỨC NĂNG
 
 ### Nguyên lý lớp phân tích (Analysis Entity Classes)
 1. Thể hiện các **khái niệm nghiệp vụ cốt lõi** trong miền bài toán (Domain Model).
@@ -486,7 +545,7 @@ classDiagram
 
 ---
 
-## 4. BIỂU ĐỒ LỚP THỰC THỂ THIẾT KẾ CHO HỆ THỐNG VÀ CHO CÁC CHỨC NĂNG
+## 6. BIỂU ĐỒ LỚP THỰC THỂ THIẾT KẾ CHO HỆ THỐNG VÀ CHO CÁC CHỨC NĂNG
 
 ### Nguyên lý lớp thiết kế (Design Entity Classes)
 1. Thể hiện **mô hình hướng đối tượng chi tiết** sẵn sàng ánh xạ ORM (JPA/Hibernate) và sinh mã nguồn.
@@ -867,13 +926,13 @@ classDiagram
 
 ---
 
-## 5. HƯỚNG DẪN NỘP BÀI VÀ THAY ĐỔI THÔNG TIN NHÓM
+## 7. HƯỚNG DẪN NỘP BÀI VÀ THAY ĐỔI THÔNG TIN NHÓM
 
 1. **Tệp tài liệu nộp Thầy Hiển:**
-   * Tệp Word chính thức đã nhúng đầy đủ 20 sơ đồ: **`PTTK/N12 Nhóm 01.docx`**.
+   * Tệp Word chính thức đã nhúng đầy đủ 22 sơ đồ & mockup: **`PTTK/N13 Nhóm 01.docx`** (hoặc `PTTK/N12 Nhóm 01 - HoanChinh.docx`).
    * Thư mục chứa toàn bộ ảnh sơ đồ chất lượng cao (300 DPI): `PTTK/diagrams/`.
 2. **Email nhận bài:** `ndhien@hotmail.com`
-3. **Tiêu đề email & tên tệp:** `N12<Nhóm Mã số>.docx` (Ví dụ: `N12 Nhóm 01.docx`).
+3. **Tiêu đề email & tên tệp:** `N13<Nhóm Mã số>.docx` hoặc `N12<Nhóm Mã số>.docx` (Ví dụ: `N13 Nhóm 01.docx`).
 4. **Cách thay đổi mã nhóm hoặc họ tên thành viên trong 1 câu lệnh:**
    * Mở tệp `generate_word_report.py`, chỉnh sửa thông tin trong mảng `members_data` và `meta_data`.
    * Chạy lệnh `python generate_word_report.py` để sinh lại tệp Word ngay lập tức.
